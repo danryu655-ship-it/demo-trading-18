@@ -1,0 +1,141 @@
+{
+  "note": "BACKTEST 7 HARI, 1 jam, bias dihitung dari candle 1 jam (aproksimasi). Di LIVE bias dari candle 1 menit seperti Market Move. Bukan janji profit.",
+  "variant": "TF=1h SL=1.5xATR TP=2R filter=close>EMA50 bias>55 rsi<=70 long-only max3pos risk0.4%",
+  "periodDays": 7,
+  "startBalance": 1000,
+  "failedCoins": [],
+  "trades": 20,
+  "wins": 5,
+  "losses": 15,
+  "winRate": 25,
+  "profitFactor": 0.61,
+  "finalBalance": 976.85,
+  "returnPct": -2.32,
+  "maxDrawdownPct": 3.84,
+  "tradesPerCoin": {
+    "BTC": 2,
+    "XAU": 2,
+    "ASTER": 1,
+    "BNB": 1,
+    "HYPE": 1,
+    "SUI": 3,
+    "JUP": 2,
+    "PYTH": 1,
+    "WCT": 4,
+    "ONDO": 1,
+    "SOMI": 1,
+    "SHIB": 1
+  },
+  "lastTrades": [
+    {
+      "coin": "WCT",
+      "entry": "2026-11-20T07:00",
+      "exit": "2026-11-20T11:00",
+      "entryPrice": 0.029725944,
+      "exitPrice": 0.0308751,
+      "reason": "TP",
+      "net": 7.4093,
+      "r": 1.93,
+      "balance": 968.98
+    },
+    {
+      "coin": "WCT",
+      "entry": "2026-11-22T09:00",
+      "exit": "2026-11-23T01:00",
+      "entryPrice": 0.029685936,
+      "exitPrice": 0.0290972,
+      "reason": "SL",
+      "net": -4.1491,
+      "r": -1.07,
+      "balance": 964.83
+    },
+    {
+      "coin": "XAU",
+      "entry": "2026-11-23T00:00",
+      "exit": "2026-11-23T01:00",
+      "entryPrice": 3579.055668,
+      "exitPrice": 3612.12,
+      "reason": "TP",
+      "net": 6.5962,
+      "r": 1.7,
+      "balance": 971.42
+    },
+    {
+      "coin": "BTC",
+      "entry": "2026-11-22T10:00",
+      "exit": "2026-11-23T13:00",
+      "entryPrice": 61135.204596,
+      "exitPrice": 63185.5,
+      "reason": "TP",
+      "net": 7.424,
+      "r": 1.92,
+      "balance": 978.85
+    },
+    {
+      "coin": "ONDO",
+      "entry": "2026-11-23T05:00",
+      "exit": "2026-11-23T13:00",
+      "entryPrice": 0.28505699999999995,
+      "exitPrice": 0.294132,
+      "reason": "TP",
+      "net": 7.4257,
+      "r": 1.91,
+      "balance": 986.27
+    },
+    {
+      "coin": "SUI",
+      "entry": "2026-11-23T05:00",
+      "exit": "2026-11-23T13:00",
+      "entryPrice": 0.6596318999999999,
+      "exitPrice": 0.680386,
+      "reason": "TP",
+      "net": 7.4217,
+      "r": 1.91,
+      "balance": 993.7
+    },
+    {
+      "coin": "WCT",
+      "entry": "2026-11-23T16:00",
+      "exit": "2026-11-23T17:00",
+      "entryPrice": 0.029555909999999998,
+      "exitPrice": 0.0290226,
+      "reason": "SL",
+      "net": -4.2834,
+      "r": -1.08,
+      "balance": 989.41
+    },
+    {
+      "coin": "SOMI",
+      "entry": "2026-11-23T15:00",
+      "exit": "2026-11-23T18:00",
+      "entryPrice": 0.12012402,
+      "exitPrice": 0.117287,
+      "reason": "SL",
+      "net": -4.2092,
+      "r": -1.06,
+      "balance": 985.2
+    },
+    {
+      "coin": "SHIB",
+      "entry": "2026-11-24T06:00",
+      "exit": "2026-11-24T09:00",
+      "entryPrice": 0.000003690738,
+      "exitPrice": 0.00000361952,
+      "reason": "SL",
+      "net": -4.2265,
+      "r": -1.07,
+      "balance": 980.98
+    },
+    {
+      "coin": "JUP",
+      "entry": "2026-11-24T06:00",
+      "exit": "2026-11-24T09:00",
+      "entryPrice": 0.24274853999999998,
+      "exitPrice": 0.235667,
+      "reason": "SL",
+      "net": -4.128,
+      "r": -1.05,
+      "balance": 976.85
+    }
+  ]
+}

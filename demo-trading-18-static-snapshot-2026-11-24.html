@@ -1,0 +1,2021 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Demo Trading 18 — Paper / Virtual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #eef1f4;
+        --surface: #ffffff;
+        --surface-2: #f6f8fa;
+        --ink: #10161d;
+        --muted: #5a6a78;
+        --faint: #8595a3;
+        --line: #d9e0e6;
+        --green: #0d7a4f;
+        --green-bg: #e2f4ea;
+        --red: #c22727;
+        --red-bg: #fbe7e7;
+        --amber: #9a6a00;
+        --amber-bg: #fdf0d3;
+        --teal: #0b6e63;
+        --teal-bg: #dcf2ee;
+        --chip: #e8edf1;
+        --shadow: 0 1px 2px rgba(16, 22, 29, .05), 0 4px 14px rgba(16, 22, 29, .05);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0a0e13;
+          --surface: #12181f;
+          --surface-2: #171f28;
+          --ink: #e7edf2;
+          --muted: #93a3b1;
+          --faint: #67778a;
+          --line: #232e39;
+          --green: #3ecf8e;
+          --green-bg: #10301f;
+          --red: #ff6b5e;
+          --red-bg: #3a1a17;
+          --amber: #f2b63d;
+          --amber-bg: #33270c;
+          --teal: #3ecfc0;
+          --teal-bg: #0e2e2a;
+          --chip: #1c2631;
+          --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 4px 14px rgba(0, 0, 0, .25);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace; }
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 48px; }
+
+      /* ---------- Header ---------- */
+      .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+      .badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 11px; font-weight: 800; letter-spacing: .12em;
+        padding: 6px 12px; border-radius: 999px; min-height: 28px;
+      }
+      .badge-paper { background: var(--amber-bg); color: var(--amber); border: 1px solid currentColor; }
+      .badge-live { background: var(--teal-bg); color: var(--teal); border: 1px solid currentColor; }
+      .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+      h1 { font-size: clamp(26px, 4.5vw, 38px); line-height: 1.12; margin: 0 0 8px; font-weight: 800; letter-spacing: -.01em; }
+      .lede { color: var(--muted); max-width: 72ch; margin: 0 0 4px; }
+      .lede strong { color: var(--ink); }
+
+      .snapshot-note {
+        margin-top: 16px; padding: 12px 14px; border-radius: 8px;
+        background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow);
+        font-size: 13.5px;
+      }
+      .snapshot-note .tag {
+        display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em;
+        background: var(--chip); color: var(--muted); border-radius: 4px; padding: 2px 7px; margin-right: 8px;
+        vertical-align: 1px;
+      }
+
+      /* ---------- KPI ---------- */
+      .kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
+      @media (min-width: 720px) { .kpis { grid-template-columns: repeat(3, 1fr); } }
+      @media (min-width: 1024px) { .kpis { grid-template-columns: repeat(6, 1fr); } }
+      .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; box-shadow: var(--shadow); }
+      .kpi .label { font-size: 11px; font-weight: 700; letter-spacing: .09em; color: var(--muted); text-transform: uppercase; }
+      .kpi .value { font-size: 24px; font-weight: 700; margin-top: 4px; line-height: 1.15; }
+      .kpi .sub { font-size: 12px; color: var(--faint); margin-top: 3px; }
+      .pos { color: var(--green); } .neg { color: var(--red); } .neu { color: var(--muted); }
+
+      /* ---------- Sections ---------- */
+      section { margin-top: 34px; }
+      .sec-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+      h2 { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: -.01em; }
+      .sec-sub { color: var(--muted); font-size: 13.5px; margin: 4px 0 0; max-width: 78ch; }
+
+      /* ---------- Live bias ---------- */
+      .live-bar {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+        background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+        padding: 12px 14px; box-shadow: var(--shadow); margin-top: 12px;
+      }
+      .live-status { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 12px; letter-spacing: .1em; }
+      .live-status .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--faint); flex: none; }
+      .live-status.ok { color: var(--teal); } .live-status.ok .dot { background: var(--teal); }
+      .live-status.err { color: var(--red); } .live-status.err .dot { background: var(--red); }
+      .live-status.loading { color: var(--amber); } .live-status.loading .dot { background: var(--amber); }
+      @media (prefers-reduced-motion: no-preference) {
+        .live-status.loading .dot, .live-status.ok .dot { animation: pulse 1.6s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+      }
+      .live-meta { color: var(--muted); font-size: 13px; }
+      .btn {
+        margin-left: auto; min-height: 40px; padding: 8px 18px; border-radius: 8px;
+        border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+        font: inherit; font-weight: 700; font-size: 14px; cursor: pointer;
+      }
+      .btn:active { transform: translateY(1px); }
+      .btn:disabled { opacity: .55; cursor: wait; }
+
+      .coin-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+      @media (min-width: 620px) { .coin-grid { grid-template-columns: repeat(2, 1fr); } }
+      @media (min-width: 980px) { .coin-grid { grid-template-columns: repeat(3, 1fr); } }
+      .coin {
+        background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+        padding: 13px 14px; box-shadow: var(--shadow);
+      }
+      .coin-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+      .coin-sym { font-weight: 800; font-size: 16px; }
+      .coin-name { color: var(--faint); font-size: 12px; font-weight: 500; margin-left: 6px; }
+      .coin-price { font-size: 14px; font-weight: 600; text-align: right; }
+      .coin-chg { font-size: 12px; text-align: right; }
+      .bias-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+      .bias-num { font-size: 30px; font-weight: 700; line-height: 1; min-width: 52px; }
+      .bias-track { position: relative; flex: 1; height: 10px; background: var(--chip); border-radius: 4px; }
+      .bias-fill { position: absolute; inset: 0 auto 0 0; width: 0%; border-radius: 4px; background: var(--faint); transition: width .5s ease; }
+      .bias-gate { position: absolute; top: -3px; bottom: -3px; left: 55%; width: 2px; background: var(--ink); opacity: .55; }
+      .bias-scale { display: flex; justify-content: space-between; font-size: 10px; color: var(--faint); margin-top: 4px; }
+      .coin-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 9px; font-size: 12px; color: var(--muted); }
+      .coin-meta b { color: var(--ink); font-weight: 600; }
+      .gate-tag { font-size: 11px; font-weight: 800; letter-spacing: .05em; padding: 3px 8px; border-radius: 4px; }
+      .gate-yes { background: var(--green-bg); color: var(--green); }
+      .gate-short { background: var(--red-bg); color: var(--red); }
+      .gate-no { background: var(--chip); color: var(--muted); }
+      .bias-gate-short { left: 45%; }
+
+      /* ---------- Badge arah posisi ---------- */
+      .side { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .06em; padding: 3px 9px; border-radius: 4px; white-space: nowrap; }
+      .side-long { background: var(--green-bg); color: var(--green); }
+      .side-short { background: var(--red-bg); color: var(--red); }
+
+      /* ---------- Kartu posisi terbuka (live) ---------- */
+      .pos-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+      @media (min-width: 720px) { .pos-grid { grid-template-columns: repeat(2, 1fr); } }
+      .pos-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; box-shadow: var(--shadow); }
+      .pos-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+      .pos-sym { font-weight: 800; font-size: 17px; }
+      .pos-name { color: var(--faint); font-size: 12px; font-weight: 500; margin-left: 6px; }
+      .pos-open { color: var(--muted); font-size: 12px; margin-top: 2px; }
+      .pos-plrow { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-top: 12px; }
+      .pos-pl-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+      .pos-pl-sub { font-size: 12px; color: var(--faint); margin-top: 2px; }
+      .pos-pl-val { font-size: 24px; font-weight: 700; line-height: 1.1; white-space: nowrap; }
+      .pos-rows { margin-top: 10px; border-top: 1px solid var(--line); }
+      .pos-row { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+      .pos-row:last-child { border-bottom: none; }
+      .pos-row .k { color: var(--muted); font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; flex: none; }
+      .pos-row .v { font-weight: 600; text-align: right; }
+      .pos-row .v small { color: var(--faint); font-weight: 500; }
+      .pos-total {
+        display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 14px;
+        margin-top: 12px; padding: 12px 14px; background: var(--surface);
+        border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); font-size: 14px;
+      }
+      .pos-total .t-val { font-size: 18px; font-weight: 700; }
+
+      /* ---------- Tutup manual (permintaan disalin sebagai perintah chat) ---------- */
+      .pos-close-btn {
+        width: 100%; margin-top: 12px; min-height: 42px; padding: 9px 14px;
+        border-radius: 8px; border: 1px solid var(--red); background: var(--red-bg); color: var(--red);
+        font: inherit; font-size: 14px; font-weight: 800; letter-spacing: .02em; cursor: pointer;
+      }
+      .pos-close-btn:active { transform: translateY(1px); }
+      .pos-close-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+      .pos-pending {
+        margin-top: 10px; padding: 8px 10px; border-radius: 6px;
+        background: var(--amber-bg); color: var(--amber); font-size: 12.5px; font-weight: 700; line-height: 1.45;
+      }
+      .pos-close-all {
+        min-height: 38px; padding: 7px 14px; border-radius: 8px;
+        border: 1px solid var(--red); background: var(--red-bg); color: var(--red);
+        font: inherit; font-size: 13px; font-weight: 800; cursor: pointer;
+      }
+      .pos-close-all:active { transform: translateY(1px); }
+      .pos-close-all:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+      .close-note {
+        margin-top: 12px; padding: 12px 14px; border-radius: 10px;
+        background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow);
+        font-size: 13.5px; color: var(--muted);
+      }
+      .close-note b { color: var(--ink); }
+
+      /* ---------- Modal konfirmasi tutup posisi ---------- */
+      .close-modal-backdrop { position: fixed; inset: 0; z-index: 90; background: rgba(0, 0, 0, .52); }
+      .close-modal-backdrop[hidden] { display: none; }
+      .close-modal {
+        position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 91;
+        width: 430px; max-width: calc(100vw - 28px); max-height: calc(100dvh - 40px); overflow-y: auto;
+        background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, .32); padding: 18px;
+      }
+      .close-modal[hidden] { display: none; }
+      .close-modal h3 { margin: 0 0 4px; font-size: 17px; font-weight: 800; }
+      .close-modal .cm-sub { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
+      .cm-warn {
+        margin: 12px 0 0; padding: 10px 12px; border-radius: 8px;
+        background: var(--amber-bg); color: var(--amber); font-size: 13px; line-height: 1.5;
+      }
+      .cm-warn b { font-weight: 800; }
+      .cm-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+      .cm-btn {
+        flex: 1 1 auto; min-height: 44px; padding: 10px 14px; border-radius: 8px;
+        font: inherit; font-size: 14px; font-weight: 800; cursor: pointer;
+        border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+      }
+      .cm-btn:active { transform: translateY(1px); }
+      .cm-btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+      .cm-btn-confirm { background: var(--red); border-color: var(--red); color: #fff; }
+      .cm-cmd {
+        margin-top: 12px; padding: 12px 14px; border-radius: 8px; text-align: center;
+        background: var(--chip); color: var(--ink); font-size: 17px; font-weight: 700; letter-spacing: .02em;
+        user-select: all;
+      }
+      .cm-note { color: var(--muted); font-size: 13px; margin: 12px 0 0; line-height: 1.5; }
+
+      /* ---------- Ceklis syarat entry ---------- */
+      .chk { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 9px; border-radius: 999px; background: var(--chip); color: var(--muted); }
+      .chk .lamp { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--faint); }
+      .chk.ok { background: var(--green-bg); color: var(--green); }
+      .chk.ok .lamp { background: var(--green); }
+      .chk.no { background: var(--red-bg); color: var(--red); }
+      .chk.no .lamp { background: var(--red); }
+      .chk.na { background: var(--chip); color: var(--muted); }
+      .chk-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+      .chk-side { font-size: 11px; font-weight: 800; letter-spacing: .07em; min-width: 52px; }
+      .ready-tag { font-size: 11px; font-weight: 800; letter-spacing: .05em; padding: 3px 8px; border-radius: 4px; background: var(--chip); color: var(--muted); }
+      .ready-long { background: var(--green-bg); color: var(--green); }
+      .ready-short { background: var(--red-bg); color: var(--red); }
+      .example { border-top: 1px solid var(--line); padding: 12px 14px; }
+      .example:first-child { border-top: none; }
+      .example-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; align-items: baseline; }
+      .example-why { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+      /* ---------- Catatan short ---------- */
+      .note-short {
+        margin-top: 12px; padding: 13px 14px; border-radius: 10px;
+        background: var(--amber-bg); color: var(--amber);
+        border: 1px solid currentColor; font-size: 13.5px;
+      }
+      .note-short b { font-weight: 800; }
+      .coin-err { color: var(--red); font-weight: 700; font-size: 12px; letter-spacing: .06em; }
+      .bias-bear { color: var(--red); } .bias-mid { color: var(--amber); } .bias-bull { color: var(--green); }
+      .fill-bear { background: var(--red); } .fill-mid { background: var(--amber); } .fill-bull { background: var(--green); }
+
+      /* ---------- Tables / empty states ---------- */
+      .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); margin-top: 12px; overflow: hidden; }
+      .empty { padding: 26px 18px; text-align: center; color: var(--muted); }
+      .empty .big { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+      table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+      th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+      th { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); }
+      td.num, th.num { text-align: right; }
+      tr:last-child td { border-bottom: none; }
+      /* Telepon: tabel menumpuk jadi baris berlabel, tidak terpotong / tidak scroll menyamping */
+      @media (max-width: 640px) {
+        table, tbody, tr, td { display: block; width: 100%; }
+        thead { display: none; }
+        tbody tr { padding: 8px 0; border-bottom: 1px solid var(--line); }
+        tbody tr:last-child { border-bottom: none; }
+        td {
+          display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+          border-bottom: none; padding: 4px 14px; text-align: right;
+        }
+        td::before {
+          content: attr(data-label); flex: none; text-align: left;
+          font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted);
+        }
+        td[colspan] { display: block; text-align: center; padding: 18px 14px; }
+        td[colspan]::before { content: none; }
+      }
+
+      /* ---------- Rules ---------- */
+      .rules { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+      @media (min-width: 720px) { .rules { grid-template-columns: repeat(2, 1fr); } }
+      .rule { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; box-shadow: var(--shadow); }
+      .rule h3 { margin: 0 0 6px; font-size: 14px; font-weight: 800; }
+      .rule p { margin: 0; color: var(--muted); font-size: 13.5px; }
+      .rule p b { color: var(--ink); }
+
+      /* ---------- Filter tanggal backtest long-only ---------- */
+      .bt-filter {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+        background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+        padding: 12px 14px; box-shadow: var(--shadow); margin-top: 12px;
+      }
+      .bt-filter label { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+      .bt-filter select, .bt-filter input[type="date"] {
+        min-height: 40px; padding: 8px 10px; border-radius: 8px;
+        border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+        font: inherit; font-size: 14px; font-weight: 600;
+      }
+      .bt-filter select:focus-visible, .bt-filter input[type="date"]:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+      .bt-filter .bt-summary { margin-left: auto; font-size: 13.5px; color: var(--muted); }
+      .bt-filter .bt-summary b { color: var(--ink); }
+      /* HP: label filter di baris sendiri; dropdown tanggal + tombol Kalender
+         berdampingan kiri-kanan dengan porsi cukup supaya tidak terpotong. */
+      @media (max-width: 640px) {
+        .bt-filter { gap: 10px; padding: 12px; }
+        .bt-filter label { flex: 0 0 100%; }
+        .bt-filter select { flex: 1.25 1 0; min-width: 0; padding: 8px; }
+        .bt-cal-wrap { flex: 1 1 0; min-width: 0; }
+        .bt-cal-btn { width: 100%; justify-content: center; white-space: nowrap; padding: 8px; gap: 6px; }
+        .bt-filter .bt-summary { margin-left: 0; width: 100%; }
+        /* Jaring pengaman: tidak ada scroll menyamping di HP */
+        body { overflow-x: clip; }
+      }
+
+      /* ---------- Kalender custom filter backtest: titik hijau = ada trade ---------- */
+      .bt-cal-wrap { position: relative; }
+      .bt-cal-btn {
+        min-height: 40px; padding: 8px 12px; border-radius: 8px;
+        border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+        font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 8px;
+      }
+      .bt-cal-btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+      .bt-cal-btn svg { flex: none; }
+      .bt-cal {
+        position: absolute; top: calc(100% + 8px); left: 0; z-index: 40;
+        width: 300px; max-width: calc(100vw - 32px);
+        background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, .22); padding: 14px;
+      }
+      .bt-cal-head { font-weight: 800; font-size: 15px; text-align: center; }
+      .bt-cal-sub { text-align: center; font-size: 12px; color: var(--faint); margin: 2px 0 8px; }
+      .bt-cal-week { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--faint); margin-bottom: 4px; }
+      .bt-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+      .bt-cal-day {
+        display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+        gap: 2px; min-height: 42px; padding: 3px 0;
+        border: none; border-radius: 8px; background: transparent; color: var(--ink);
+        font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+      }
+      .bt-cal-day:hover:not(:disabled) { background: var(--surface-2); }
+      .bt-cal-day:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+      .bt-cal-day:disabled { color: var(--faint); opacity: .5; cursor: default; font-weight: 500; }
+      .bt-cal-num { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; flex: none; }
+      .bt-cal-day.selected .bt-cal-num { background: var(--teal); color: #fff; }
+      .bt-cal-dotmark { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; flex: none; box-shadow: 0 0 0 1px rgba(0, 0, 0, .10); }
+      .bt-cal-day:not(.has-trade) .bt-cal-dotmark { visibility: hidden; }
+      .bt-cal-legend { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); margin: 10px 0 0; }
+      .bt-cal-clear {
+        margin-top: 10px; width: 100%; min-height: 38px; border-radius: 8px;
+        border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+        font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer;
+      }
+      .bt-cal-clear:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+      .bt-cal-backdrop { display: none; }
+      /* HP: kalender tampil sebagai popup di tengah layar — lebar pas,
+         tidak keluar layar, tidak menggeser / menutupi konten secara berantakan. */
+      @media (max-width: 640px) {
+        .bt-cal {
+          position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+          width: min(92vw, 340px); max-width: 92vw;
+          max-height: 92vh; overflow-y: auto; z-index: 90;
+        }
+        .bt-cal-backdrop:not([hidden]) {
+          display: block; position: fixed; inset: 0; z-index: 89;
+          background: rgba(0, 0, 0, .45);
+        }
+      }
+
+      /* ---------- Backtest ---------- */
+      .bt-banner {
+        margin-top: 12px; border-radius: 10px; padding: 14px;
+        background: var(--red-bg); color: var(--red); font-weight: 700; font-size: 14px;
+        border: 1px solid currentColor;
+      }
+      .bt-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+      @media (min-width: 720px) { .bt-grid { grid-template-columns: repeat(3, 1fr); } }
+      @media (min-width: 1024px) { .bt-grid { grid-template-columns: repeat(6, 1fr); } }
+      .bt-bar-wrap { margin-top: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; box-shadow: var(--shadow); }
+      .bt-bar-label { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); margin-bottom: 6px; }
+      .bt-bar { height: 14px; border-radius: 4px; background: var(--chip); position: relative; overflow: hidden; }
+      .bt-bar > div { position: absolute; inset: 0 auto 0 0; background: var(--red); width: 98.08%; }
+
+      /* ---------- Berita & agenda penting ---------- */
+      .news-source {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+        background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+        padding: 12px 14px; box-shadow: var(--shadow); margin-top: 12px; font-size: 13.5px;
+      }
+      .news-source .tag {
+        display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em;
+        background: var(--chip); color: var(--muted); border-radius: 4px; padding: 2px 7px;
+      }
+      .news-source a { color: var(--teal); font-weight: 700; word-break: break-word; }
+      .news-source a:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+      .news-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+      .news-item {
+        display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 14px;
+        background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+        padding: 14px; box-shadow: var(--shadow);
+      }
+      .news-date { text-align: center; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 6px; align-self: start; }
+      .news-date .dow { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+      .news-date .dnum { display: block; font-size: 26px; font-weight: 800; line-height: 1.1; margin-top: 2px; }
+      .news-date .dmon { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-top: 1px; }
+      .news-body h3 { margin: 0 0 6px; font-size: 15px; font-weight: 800; line-height: 1.35; }
+      .news-body ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; }
+      .news-body ul li { margin: 3px 0; }
+      .news-body ul li b { color: var(--ink); }
+      .news-outlook {
+        margin-top: 12px; padding: 13px 14px; border-radius: 10px;
+        background: var(--amber-bg); color: var(--amber);
+        border: 1px solid currentColor; font-size: 13.5px;
+      }
+      .news-outlook b { font-weight: 800; }
+      @media (max-width: 640px) {
+        .news-item { grid-template-columns: 76px minmax(0, 1fr); gap: 10px; padding: 12px; }
+        .news-date .dnum { font-size: 22px; }
+      }
+
+      footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+      footer p { margin: 0 0 8px; max-width: 82ch; }
+
+      /* ---------- Sidebar / navbar floating untuk navigasi baca ---------- */
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      section, #ringkasan { scroll-margin-top: 18px; }
+
+      .page-shell {
+        max-width: 1420px; margin: 0 auto; padding: 0 16px;
+        display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 22px; align-items: start;
+      }
+      .page-shell .wrap { max-width: 1180px; width: 100%; margin: 0; padding-left: 0; padding-right: 0; }
+
+      .floating-nav {
+        position: sticky; top: 18px; margin-top: 20px; z-index: 30;
+        background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+        box-shadow: var(--shadow); padding: 14px;
+        max-height: calc(100vh - 36px); overflow-y: auto;
+      }
+      .fn-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+      .fn-title { font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+      .fn-sub { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+      .fn-close {
+        display: none; flex: none; width: 36px; height: 36px; align-items: center; justify-content: center;
+        border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); color: var(--ink);
+        font-size: 20px; line-height: 1; cursor: pointer;
+      }
+      .fn-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+      .fn-list a {
+        display: flex; align-items: flex-start; gap: 9px;
+        padding: 9px 10px; border-radius: 8px;
+        color: var(--ink); text-decoration: none; font-size: 13.5px; font-weight: 600; line-height: 1.35;
+      }
+      .fn-list a:hover { background: var(--surface-2); }
+      .fn-list a:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+      .fn-list a.active { background: var(--teal-bg); color: var(--teal); }
+      .fn-num {
+        flex: none; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; font-weight: 700;
+        background: var(--chip); color: var(--muted); border-radius: 999px; padding: 2px 7px; margin-top: 1px;
+      }
+      .fn-list a.active .fn-num { background: var(--surface); color: var(--teal); }
+      .fn-foot {
+        margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line);
+        font-size: 12px; color: var(--muted); line-height: 1.45;
+      }
+      .fn-toggle { display: none; }
+      .fn-backdrop { display: none; }
+
+      @media (max-width: 1023px) {
+        .page-shell { display: block; padding: 0; }
+        /* Ruang khusus untuk rel angka fixed di kiri (lebar 58px di left:12px):
+           konten digeser ke kanan supaya tidak ada teks yang tertutup rel
+           di posisi scroll mana pun. */
+        .page-shell .wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 96px 84px; }
+        section, #ringkasan { scroll-margin-top: 14px; }
+        .fn-toggle {
+          display: inline-flex; align-items: center; gap: 9px;
+          position: fixed; left: 14px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 70;
+          min-height: 48px; padding: 11px 18px; border-radius: 999px;
+          background: var(--ink); color: var(--bg); border: 1px solid var(--line);
+          font: inherit; font-size: 14px; font-weight: 800; letter-spacing: .01em; cursor: pointer;
+          box-shadow: 0 10px 28px rgba(0, 0, 0, .28);
+        }
+        .fn-toggle:active { transform: translateY(1px); }
+        .fn-toggle .fn-toggle-icon { font-size: 18px; line-height: 1; }
+        /* HP: rel terlipat yang selalu terlihat — angka 01–07 tetap bisa diklik;
+           tombol Menu Seksi memperluasnya jadi panel penuh. */
+        .floating-nav {
+          position: fixed; left: 12px; right: auto; top: auto;
+          bottom: calc(74px + env(safe-area-inset-bottom)); margin: 0;
+          width: 58px; padding: 10px 8px; max-height: min(72vh, 580px);
+          overflow-y: auto; z-index: 68;
+          transition: width .18s ease; 
+        }
+        @media (prefers-reduced-motion: reduce) { .floating-nav { transition: none; } }
+        .floating-nav .fn-head, .floating-nav .fn-foot { display: none; }
+        .floating-nav .fn-list { margin: 0; gap: 6px; }
+        .floating-nav .fn-list a { justify-content: center; padding: 8px 4px; }
+        .floating-nav .fn-list a span:last-child { display: none; }
+        .floating-nav.open { width: min(86vw, 324px); padding: 14px; }
+        .floating-nav.open .fn-head { display: flex; }
+        .floating-nav.open .fn-foot { display: block; }
+        .floating-nav.open .fn-list { margin-top: 12px; gap: 4px; }
+        .floating-nav.open .fn-list a { justify-content: flex-start; padding: 9px 10px; }
+        .floating-nav.open .fn-list a span:last-child { display: inline; }
+        .fn-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, .42); z-index: 67; }
+        .fn-backdrop:not([hidden]) { display: block; }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="fn-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="floatingNav" aria-label="Buka navigasi seksi dashboard">
+      <span class="fn-toggle-icon" aria-hidden="true">☰</span><span>Menu Seksi</span>
+    </button>
+    <div class="fn-backdrop" id="navBackdrop" hidden></div>
+
+    <div class="page-shell">
+      <nav class="floating-nav" id="floatingNav" aria-label="Navigasi seksi dashboard">
+        <div class="fn-head">
+          <div>
+            <span class="fn-title">Navigasi Baca</span>
+            <span class="fn-sub">Klik untuk langsung loncat ke seksi — tidak perlu scroll panjang.</span>
+          </div>
+        </div>
+        <ul class="fn-list">
+          <li><a href="#ringkasan" data-target="ringkasan"><span class="fn-num">01</span><span>Ringkasan Saldo</span></a></li>
+          <li><a href="#bias-live" data-target="bias-live"><span class="fn-num">02</span><span>Bias Momentum per Koin — Live</span></a></li>
+          <li><a href="#syarat-entry" data-target="syarat-entry"><span class="fn-num">03</span><span>Bias Momentum &amp; 4 Syarat Entry</span></a></li>
+          <li><a href="#posisi-terbuka" data-target="posisi-terbuka"><span class="fn-num">04</span><span>Posisi Terbuka</span></a></li>
+          <li><a href="#trade-selesai" data-target="trade-selesai"><span class="fn-num">05</span><span>Riwayat Trade &amp; P/L</span></a></li>
+          <li><a href="#aturan" data-target="aturan"><span class="fn-num">06</span><span>Aturan Strategi</span></a></li>
+          <li><a href="#backtest" data-target="backtest"><span class="fn-num">07</span><span>Hasil Backtest</span></a></li>
+          <li><a href="#berita-agenda" data-target="berita-agenda"><span class="fn-num">08</span><span>Berita &amp; Agenda Penting</span></a></li>
+        </ul>
+        <p class="fn-foot">Sidebar ini tetap menempel saat kamu scroll. Seksi yang sedang kamu baca akan ditandai.</p>
+      </nav>
+
+    <div class="wrap">
+
+      <div class="badges" aria-label="Label demo">
+        <span class="badge badge-paper"><span class="dot"></span>PAPER TRADING</span>
+        <span class="badge badge-paper">DEMO</span>
+        <span class="badge badge-paper">UANG VIRTUAL — BUKAN UANG ASLI</span>
+        <span class="badge badge-paper">TANPA EKSEKUSI ORDER</span>
+        <span class="badge badge-paper">TANPA API KEY</span>
+      </div>
+
+      <h1>Demo Trading 18</h1>
+      <p class="lede">
+        Simulasi trading <strong>18 koin</strong> dengan saldo awal <strong>virtual $1.000</strong>, memakai sinyal
+        <strong>Bias Momentum Market Move</strong>. Strateginya sekarang <strong>LONG + SHORT</strong> — bukan long-only lagi:
+        mesin boleh membuka posisi <strong>LONG</strong> (untung saat harga naik) maupun <strong>SHORT</strong>
+        (untung saat harga turun), dengan rule short sebagai cerminan rule long. Semua angka uang di halaman ini adalah
+        <strong>VIRTUAL / PAPER</strong> — tidak ada uang asli, tidak ada order yang dikirim ke exchange,
+        dan tidak ada API key. Demo ini alat belajar untuk menguji aturan, bukan janji keuntungan.
+      </p>
+
+      <div class="note-short" role="note">
+        <b>Catatan jujur soal SHORT:</b> short di demo ini <b>HANYA simulasi</b>. Di trading real, short
+        <b>TIDAK bisa dilakukan di Spot</b> — short butuh akun <b>Futures/margin</b>, dengan risiko
+        <b>likuidasi</b> (posisi ditutup paksa dan saldo bisa habis) dan biaya <b>funding</b> berkala.
+        Jangan menyalin posisi short demo ini ke akun real tanpa memahami risiko tersebut.
+      </div>
+
+      <div class="snapshot-note" role="note">
+        <span class="tag">LIVE</span>
+        Panel saldo, posisi, dan trade di bawah sekarang <strong>LIVE</strong> — daftar posisi dimuat dari
+        file posisi mesin demo dan <strong>diperbarui otomatis tiap 60 detik</strong>, dengan harga sekarang
+        &amp; P/L mengambang dihitung live di browser dari candle Binance Spot. Stempel
+        <strong>“Terakhir diperbarui (mesin)”</strong> di seksi Posisi Terbuka adalah waktu data mesin
+        terakhir ditulis. Skor Bias Momentum dan ceklis 4 syarat entry juga dihitung live di browser
+        (lihat label DATA LIVE di seksinya).
+      </div>
+
+      <!-- KPI live -->
+      <div class="kpis" id="ringkasan" aria-label="Ringkasan akun demo (live)">
+        <div class="kpi">
+          <div class="label">Saldo Virtual</div>
+          <div class="value mono" id="kpiBalance">$1.000,00</div>
+          <div class="sub">Modal awal virtual $1.000</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Total P/L Virtual</div>
+          <div class="value mono neu" id="kpiTotalPl">$0,00</div>
+          <div class="sub" id="kpiTotalPlSub">0,00% dari modal awal</div>
+        </div>
+        <div class="kpi">
+          <div class="label">P/L Hari Ini (Live)</div>
+          <div class="value mono neu" id="kpiTodayPl">$0,00</div>
+          <div class="sub">Batas rugi harian: $20 virtual</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Posisi Terbuka</div>
+          <div class="value mono" id="kpiPosCount">2 <span style="font-size:14px;color:var(--faint)">/ maks 3</span></div>
+          <div class="sub" id="kpiPosSub">SHORT SOMI · SHORT XAU</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Trade Selesai</div>
+          <div class="value mono" id="kpiTradeCount">0</div>
+          <div class="sub" id="kpiTradeSub">Belum ada trade yang ditutup</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Win Rate</div>
+          <div class="value mono neu" id="kpiWinRate">—</div>
+          <div class="sub" id="kpiWinSub">Belum ada trade yang ditutup</div>
+        </div>
+      </div>
+
+      <!-- Bias Momentum LIVE -->
+      <section id="bias-live" aria-labelledby="bias-title">
+        <div class="sec-head">
+          <div>
+            <h2 id="bias-title">Bias Momentum per Koin — Live</h2>
+            <p class="sec-sub">
+              Dihitung langsung di browser dari candle 1 menit API publik Binance Spot
+              (<span class="mono">data-api.binance.vision</span>, tanpa key), fallback Binance US → OKX → Gate.io,
+              dengan rumus yang sama seperti Market Move: RSI 14, jarak EMA20/EMA50, posisi harga terhadap EMA20,
+              dan perubahan harga 1 jam. Skor 0–100; dua garis hitam pada bar adalah <b>gate entry</b> —
+              demo boleh membuka posisi <b>LONG</b> bila skor <b>di atas 55</b>, dan posisi <b>SHORT</b> bila skor
+              <b>di bawah 45</b>, masing-masing <i>dan</i> syarat 1 jam lainnya terpenuhi (lihat Aturan Demo).
+              Skor 45–55 adalah zona netral: tidak ada posisi baru. Angka kecil “Snapshot 18:17” adalah skor
+              saat halaman ini dibuat, untuk perbandingan.
+            </p>
+          </div>
+        </div>
+
+        <div class="live-bar">
+          <span class="live-status loading" id="liveStatus"><span class="dot"></span><span id="liveStatusText">MEMUAT DATA…</span></span>
+          <span class="live-meta" id="liveMeta">Menghubungi Binance…</span>
+          <span class="live-meta mono" id="liveClock"></span>
+          <button class="btn" id="refreshBtn" type="button">Perbarui sekarang</button>
+        </div>
+
+        <div class="coin-grid" id="coinGrid"></div>
+      </section>
+
+      <!-- Penjelasan Bias + cek syarat entry -->
+      <section id="syarat-entry" aria-labelledby="gate-title">
+        <div class="sec-head">
+          <div>
+            <h2 id="gate-title">Bias Momentum &amp; 4 Syarat Entry — Kenapa Posisi Dibuka?</h2>
+            <p class="sec-sub">
+              <b>Bias Momentum</b> adalah skor 0–100 untuk membaca arah jangka pendek, dihitung dari data
+              <b>Spot</b>: RSI 14 pada candle 1 menit, jarak EMA20/EMA50 1 menit, posisi harga terhadap EMA20,
+              dan perubahan harga 1 jam. Skor ini <b>bukan</b> data futures Long/Short asli — endpoint futures
+              tidak bisa diakses dari sini, jadi arah dibaca dari harga Spot, bukan dari posisi trader lain.
+              Cara bacanya: <b>&gt; 55</b> condong long/naik, <b>45–55</b> netral, <b>&lt; 45</b> condong short/turun.
+            </p>
+            <p class="sec-sub">
+              Skor Bias yang tinggi saja <b>tidak cukup</b>. Mesin hanya membuka posisi bila <b>keempat syarat
+              kena semua di candle 1 jam yang sama</b>. Ceklis di bawah dihitung live per koin — hijau lolos,
+              merah gagal, lengkap dengan nilai sebenarnya — supaya jelas kenapa sebuah koin belum dibuka
+              meski Bias-nya sudah lewat gate.
+            </p>
+          </div>
+        </div>
+
+        <div class="rules">
+          <div class="rule">
+            <h3>4 syarat LONG — harus kena semua</h3>
+            <p>1) <b>Bias &gt; 55</b> &nbsp;2) <b>EMA 9 cross-up</b> menembus EMA 21 <b>di candle itu</b>
+            (bukan sekadar EMA 9 sudah berada di atas EMA 21) &nbsp;3) <b>Close &gt; EMA 50</b> &nbsp;4) <b>RSI 14 (1 jam) ≤ 70</b>.</p>
+          </div>
+          <div class="rule">
+            <h3>4 syarat SHORT — cerminannya</h3>
+            <p>1) <b>Bias &lt; 45</b> &nbsp;2) <b>EMA 9 cross-down</b> ke bawah EMA 21 <b>di candle itu</b>
+            &nbsp;3) <b>Close &lt; EMA 50</b> &nbsp;4) <b>RSI 14 (1 jam) ≥ 30</b>.</p>
+          </div>
+        </div>
+
+        <div class="coin-grid" id="gateGrid"></div>
+
+        <div class="panel" aria-label="Contoh terverifikasi dari run mesin">
+          <div class="example">
+            <div class="example-head">
+              <span><b class="mono">BTC</b> · cek syarat LONG</span>
+              <span class="ready-tag">TIDAK DIBUKA</span>
+            </div>
+            <div class="chk-row">
+              <span class="chk ok"><span class="lamp"></span>Bias 79 &gt; 55</span>
+              <span class="chk no"><span class="lamp"></span>EMA Cross — EMA9 $60.334 &lt; EMA21 $60.753</span>
+              <span class="chk no"><span class="lamp"></span>EMA50 — harga $60.451 &lt; EMA50 $60.912</span>
+              <span class="chk na"><span class="lamp"></span>RSI — sudah gugur di syarat EMA</span>
+            </div>
+            <p class="example-why">Bias 79 memang lolos, tapi EMA 9 masih di bawah EMA 21 dan harga masih di bawah EMA 50 — dua syarat gagal, jadi tidak ada posisi.</p>
+          </div>
+          <div class="example">
+            <div class="example-head">
+              <span><b class="mono">ENA</b> · cek syarat LONG</span>
+              <span class="ready-tag">TIDAK DIBUKA</span>
+            </div>
+            <div class="chk-row">
+              <span class="chk ok"><span class="lamp"></span>Bias 71 &gt; 55</span>
+              <span class="chk no"><span class="lamp"></span>EMA Cross — EMA9 sudah di atas EMA21, tapi tidak ada cross-up baru di candle itu</span>
+              <span class="chk ok"><span class="lamp"></span>EMA50 — harga di atas EMA50</span>
+              <span class="chk ok"><span class="lamp"></span>RSI 66,7 ≤ 70</span>
+            </div>
+            <p class="example-why">Tiga syarat lolos, tapi mesin mensyaratkan momen cross-up-nya terjadi di candle yang dinilai — bukan kondisi EMA yang sudah terlanjur di atas.</p>
+          </div>
+          <div class="example">
+            <div class="example-head">
+              <span><b class="mono">JUP</b> · cek syarat LONG</span>
+              <span class="ready-tag">TIDAK DIBUKA</span>
+            </div>
+            <div class="chk-row">
+              <span class="chk ok"><span class="lamp"></span>Bias 72 &gt; 55</span>
+              <span class="chk ok"><span class="lamp"></span>EMA Cross — lolos</span>
+              <span class="chk ok"><span class="lamp"></span>EMA50 — harga di atas EMA50</span>
+              <span class="chk no"><span class="lamp"></span>RSI 81,6 &gt; 70</span>
+            </div>
+            <p class="example-why">EMA dan harga sudah lolos, tapi RSI 1 jam 81,6 sudah overbought — mesin menahan diri agar tidak membeli di puncak.</p>
+          </div>
+          <p class="sec-sub" style="padding:10px 14px 14px;margin:0">Contoh terverifikasi dari run mesin demo pukul <b>18:59 WIB, 24 Nov 2026</b>. Ketiganya menunjukkan hal yang sama: Bias lewat gate bukan berarti posisi otomatis dibuka.</p>
+        </div>
+      </section>
+
+      <!-- Posisi terbuka (LIVE dari file posisi mesin demo) -->
+      <section id="posisi-terbuka" aria-labelledby="pos-title">
+        <h2 id="pos-title">Posisi Terbuka <span style="font-size:12px;color:var(--faint);font-weight:700;letter-spacing:.08em">· LIVE · VIRTUAL</span></h2>
+        <p class="sec-sub">Posisi paper yang sedang berjalan, dimuat <b>live</b> dari file posisi mesin demo dan
+          diperbarui otomatis tiap <b>60 detik</b>. Harga sekarang dan P/L virtual mengambang dihitung live di browser
+          dari candle 1 menit (Binance Spot, fallback Binance US → OKX → Gate.io) — P/L short = (entry − harga sekarang)
+          × jumlah, P/L long sebaliknya. Bila pengambilan data gagal, posisi terakhir yang berhasil dimuat tetap
+          ditampilkan beserta stempel waktunya — bukan angka kosong.</p>
+
+        <div class="live-bar">
+          <span class="live-status loading" id="posStatus"><span class="dot"></span><span id="posStatusText">MEMUAT POSISI…</span></span>
+          <span class="live-meta" id="posMeta">Menampilkan posisi terakhir yang tercatat — mesin per 24/11/2026, 21:24:48 WIB · harga per 21:28 WIB. Sedang memeriksa pembaruan…</span>
+          <span class="live-meta mono">Auto-refresh 60 dtk</span>
+        </div>
+
+        <div class="pos-grid" id="posGrid">
+          <article class="pos-card">
+            <div class="pos-head">
+              <div>
+                <span class="pos-sym">SOMI</span><span class="pos-name">Somnia · SOMIUSDT</span>
+                <div class="pos-open">Dibuka 24 Nov 2026, 19:29 WIB</div>
+              </div>
+              <span class="side side-short">SHORT</span>
+            </div>
+            <div class="pos-plrow">
+              <div>
+                <div class="pos-pl-label">P/L Virtual Mengambang</div>
+                <div class="pos-pl-sub">−0,06R dari risiko $4,00</div>
+              </div>
+              <div class="pos-pl-val mono neg">−$0,25</div>
+            </div>
+            <div class="pos-rows">
+              <div class="pos-row"><span class="k">Entry</span><span class="v mono">$0,113767</span></div>
+              <div class="pos-row"><span class="k">Harga Sekarang</span><span class="v mono">$0,1139 <small>· terakhir tercatat · Binance Spot</small></span></div>
+              <div class="pos-row"><span class="k">Stop Loss</span><span class="v mono">$0,115931</span></div>
+              <div class="pos-row"><span class="k">Take Profit</span><span class="v mono">$0,109439</span></div>
+              <div class="pos-row"><span class="k">Jumlah</span><span class="v mono">1.848,53 SOMI</span></div>
+              <div class="pos-row"><span class="k">Risiko</span><span class="v mono">$4,00 <small>(0,4% saldo)</small></span></div>
+              <div class="pos-row"><span class="k">Sinyal Saat Dibuka</span><span class="v">Bias 34 · RSI 1 jam 45,5 · sumber Gate.io</span></div>
+            </div>
+            <button type="button" class="pos-close-btn" data-close-coin="SOMI">Tutup Sekarang</button>
+          </article>
+          <article class="pos-card">
+            <div class="pos-head">
+              <div>
+                <span class="pos-sym">XAU</span><span class="pos-name">Emas (PAXG) · PAXGUSDT</span>
+                <div class="pos-open">Dibuka 24 Nov 2026, 21:13 WIB</div>
+              </div>
+              <span class="side side-short">SHORT</span>
+            </div>
+            <div class="pos-plrow">
+              <div>
+                <div class="pos-pl-label">P/L Virtual Mengambang</div>
+                <div class="pos-pl-sub">−0,14R dari risiko $4,00</div>
+              </div>
+              <div class="pos-pl-val mono neg">−$0,55</div>
+            </div>
+            <div class="pos-rows">
+              <div class="pos-row"><span class="k">Entry</span><span class="v mono">$3.608,88</span></div>
+              <div class="pos-row"><span class="k">Harga Sekarang</span><span class="v mono">$3.612,58 <small>· terakhir tercatat · Binance Spot</small></span></div>
+              <div class="pos-row"><span class="k">Stop Loss</span><span class="v mono">$3.635,79</span></div>
+              <div class="pos-row"><span class="k">Take Profit</span><span class="v mono">$3.555,05</span></div>
+              <div class="pos-row"><span class="k">Jumlah</span><span class="v mono">0,148613 XAU</span></div>
+              <div class="pos-row"><span class="k">Risiko</span><span class="v mono">$4,00 <small>(0,4% saldo)</small></span></div>
+              <div class="pos-row"><span class="k">Sinyal Saat Dibuka</span><span class="v">Bias 38 · RSI 1 jam 43,5 · sumber Binance Spot</span></div>
+            </div>
+            <button type="button" class="pos-close-btn" data-close-coin="XAU">Tutup Sekarang</button>
+          </article>
+        </div>
+
+        <div class="pos-total" id="posTotal">
+          <span>Total P/L mengambang · 2 posisi terbuka</span>
+          <span class="t-val mono neg">−$0,80</span>
+        </div>
+
+        <p class="close-note"><b>Tutup manual:</b> tombol <b>Tutup Sekarang</b> di tiap kartu <b>tidak</b> menutup posisi
+          langsung dari browser — halaman ini statis dan tidak terhubung ke mesin. Tombol itu membuka konfirmasi lalu menyalin
+          perintah chat (<span class="mono">tutup SOMI</span>, <span class="mono">tutup XAU</span>, atau
+          <span class="mono">tutup semua</span>) untuk ditempel ke chat Rias; mesin menutup posisi pada run berikutnya
+          (cron tiap 15 menit, jadi maks ±15 menit) dengan alasan <b>MANUAL-CLOSE</b>, di harga live saat mesin berjalan.
+          Aturan tutup otomatis robot <b>tidak berubah</b>: TP 2R, SL 1,5× ATR, keluar tren EMA, dan kill switch batas
+          rugi harian $20 tetap berlaku seperti sekarang.</p>
+
+        <div class="close-modal-backdrop" id="closeBackdrop" hidden></div>
+        <div class="close-modal" id="closeModal" role="dialog" aria-modal="true" aria-labelledby="closeModalTitle" hidden>
+          <div id="closeConfirmView">
+            <h3 id="closeModalTitle">Tutup Posisi</h3>
+            <p class="cm-sub">Periksa dulu perkiraan hasil tutupnya (virtual / paper):</p>
+            <div class="pos-rows" id="closeModalRows" style="margin-top:6px"></div>
+            <p class="cm-warn">Penutupan <b>tidak terjadi seketika</b> dari halaman ini. Perintah dieksekusi oleh mesin pada
+              run berikutnya (cron tiap 15 menit — maks ±15 menit) di <b>harga live saat mesin berjalan</b>, bukan pada harga
+              di konfirmasi ini. Harga bisa bergerak, jadi P/L akhir bisa berbeda dari perkiraan di atas.</p>
+            <div class="cm-actions">
+              <button type="button" class="cm-btn" id="closeCancelBtn">Batal</button>
+              <button type="button" class="cm-btn cm-btn-confirm" id="closeConfirmBtn">Ya, Salin Perintah Tutup</button>
+            </div>
+          </div>
+          <div id="closeDoneView" hidden>
+            <h3>Perintah Siap Dikirim</h3>
+            <p class="cm-note" id="closeDoneText" style="margin-top:4px">Perintah disalin — tempel di chat Rias, mesin akan menutup posisi ini dengan alasan MANUAL-CLOSE.</p>
+            <div class="cm-cmd mono" id="closeCmdText">tutup SOMI</div>
+            <p class="cm-note">Kartu posisi di atas <b>tidak</b> disembunyikan dan angkanya <b>tidak</b> diubah — posisi
+              benar-benar tertutup hanya setelah mesin menjalankannya, lalu hilang dari daftar pada data berikutnya.
+              Selama menunggu, kartu itu berlabel “Permintaan tutup disalin — menunggu mesin”.</p>
+            <div class="cm-actions">
+              <button type="button" class="cm-btn cm-btn-confirm" id="closeDoneBtn">Selesai</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trade selesai -->
+      <section id="trade-selesai" aria-labelledby="trades-title">
+        <h2 id="trades-title">Trade Selesai &amp; P/L <span style="font-size:12px;color:var(--faint);font-weight:700;letter-spacing:.08em">· LIVE · VIRTUAL</span></h2>
+        <p class="sec-sub">Riwayat trade paper yang sudah ditutup beserta untung/ruginya (virtual) — dimuat live dari file posisi mesin demo yang sama, diperbarui otomatis tiap 60 detik.</p>
+        <div class="panel">
+          <table aria-label="Trade selesai (live)">
+            <thead>
+              <tr>
+                <th>Koin</th><th>Arah</th><th>Dibuka</th><th>Ditutup</th>
+                <th class="num">Entry</th><th class="num">Exit</th>
+                <th>Alasan keluar</th><th class="num">P/L Virtual</th>
+              </tr>
+            </thead>
+            <tbody id="tradesBody">
+              <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:22px 14px">
+                Belum ada trade selesai — total P/L virtual <b class="mono">$0,00</b>, win rate belum bisa dihitung.
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Aturan -->
+      <section id="aturan" aria-labelledby="rules-title">
+        <h2 id="rules-title">Aturan Demo</h2>
+        <p class="sec-sub">Aturan yang sama dipakai mesin demo dan backtest di bawah. Tidak ada pengecualian dan tidak ada override manual.</p>
+        <div class="rules">
+          <div class="rule">
+            <h3>Sinyal entry LONG (candle 1 jam)</h3>
+            <p>EMA 9 <b>cross up</b> menembus EMA 21, harga tutup <b>di atas EMA 50</b>, skor
+            <b>Bias Momentum &gt; 55</b>, dan <b>RSI 14 (1 jam) ≤ 70</b> (tidak overbought).
+            Keempatnya harus kena di candle 1 jam yang sama.</p>
+          </div>
+          <div class="rule">
+            <h3>Sinyal entry SHORT (cerminan long)</h3>
+            <p>EMA 9 <b>cross down</b> ke bawah EMA 21, harga tutup <b>di bawah EMA 50</b>, skor
+            <b>Bias Momentum &lt; 45</b>, dan <b>RSI 14 (1 jam) ≥ 30</b> (tidak oversold).
+            Keempatnya juga harus kena di candle 1 jam yang sama. P/L short = (entry − exit) × qty —
+            untung saat harga turun.</p>
+          </div>
+          <div class="rule">
+            <h3>Stop loss &amp; take profit</h3>
+            <p><b>Long:</b> stop loss di <b>1,5 × ATR(14)</b> di bawah harga entry, take profit di <b>2R</b>
+            (dua kali jarak risiko) di atas entry. <b>Short cerminannya:</b> SL di entry <b>+ 1,5 × ATR(14)</b>,
+            TP di entry <b>− 2R</b>. Keluar lebih awal juga bila tren berbalik — long keluar saat EMA 9 cross down,
+            short keluar saat EMA 9 cross up.</p>
+          </div>
+          <div class="rule">
+            <h3>Ukuran risiko</h3>
+            <p>Risiko per trade <b>0,4% dari saldo virtual</b> (± $4 di saldo $1.000). Biaya simulasi:
+            fee 0,06% per sisi + slippage 0,02% — hasil demo sudah dikurangi biaya ini.</p>
+          </div>
+          <div class="rule">
+            <h3>Batas pengaman</h3>
+            <p>Maksimal <b>3 posisi terbuka total</b> — long dan short <b>berbagi cap yang sama</b>,
+            1 posisi per koin, dan tidak pernah long dan short pada koin yang sama bersamaan.
+            Batas rugi harian <b>$20 virtual</b>: bila tercapai, semua posisi ditutup dan mesin berhenti sampai hari berikutnya.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Backtest -->
+      <section id="backtest" aria-labelledby="bt-title">
+        <h2 id="bt-title">Hasil Backtest 7 Hari — LONG + SHORT, Jujur, Tanpa Janji Profit</h2>
+        <p class="sec-sub">
+          Aturan long + short yang persis sama diuji pada data 7 hari, <b>17–24 Nov 2026</b> (candle 1 jam; skor bias
+          pada backtest dihitung dari candle 1 jam sebagai pendekatan, sedangkan live memakai candle 1 menit seperti
+          Market Move). Hasilnya tetap <b>rugi</b> — ditampilkan apa adanya supaya ekspektasi tetap realistis.
+          Menambah short mengurangi kerugian dibanding long-only, tetapi belum membuatnya untung.
+        </p>
+        <div class="bt-banner">Backtest 7 hari LONG + SHORT: RUGI −1,92%. Aturan ini belum terbukti menguntungkan — demo berjalan untuk menguji, bukan untuk menjanjikan hasil.</div>
+        <div class="bt-grid">
+          <div class="kpi"><div class="label">Total Trade</div><div class="value mono">30</div><div class="sub">7 hari · 17–24 Nov 2026 · long + short</div></div>
+          <div class="kpi"><div class="label">Menang / Kalah</div><div class="value mono">9 / 21</div><div class="sub">Win rate 30%</div></div>
+          <div class="kpi"><div class="label">Profit Factor</div><div class="value mono neg">0,77</div><div class="sub">Di bawah 1 = total rugi &gt; total untung</div></div>
+          <div class="kpi"><div class="label">Saldo Awal (Virtual)</div><div class="value mono">$1.000,00</div><div class="sub">Modal uji backtest</div></div>
+          <div class="kpi"><div class="label">Saldo Akhir (Virtual)</div><div class="value mono neg">$980,79</div><div class="sub neg">−$19,21 (−1,92%)</div></div>
+          <div class="kpi"><div class="label">Max Drawdown</div><div class="value mono neg">3,99%</div><div class="sub">Penurunan terdalam dari puncak saldo</div></div>
+        </div>
+        <div class="bt-bar-wrap" aria-hidden="true">
+          <div class="bt-bar-label"><span>Saldo akhir backtest LONG + SHORT terhadap modal awal</span><span class="mono">$980,79 / $1.000 (98,08%)</span></div>
+          <div class="bt-bar"><div style="width:98.08%"></div></div>
+        </div>
+        <div class="rules">
+          <div class="rule">
+            <h3><span class="side side-long">LONG</span> &nbsp;10 trade · 2 menang</h3>
+            <p>Win rate long <b>20%</b> (2 dari 10). Sisi long adalah yang paling lemah pada periode uji ini.</p>
+          </div>
+          <div class="rule">
+            <h3><span class="side side-short">SHORT</span> &nbsp;20 trade · 7 menang</h3>
+            <p>Win rate short <b>35%</b> (7 dari 20). Short lebih sering kena daripada long, tetapi total keseluruhan
+            tetap rugi — frekuensi menang belum cukup menutup ukuran kekalahan.</p>
+          </div>
+        </div>
+        <h3 style="margin:26px 0 4px;font-size:16px">Perbandingan: backtest LONG-ONLY sebelumnya</h3>
+        <p class="sec-sub">
+          Sebelum rule short ditambahkan, aturan yang sama versi long-only menghasilkan <b>20 trade, 5 menang (25%),
+          profit factor 0,61, saldo akhir $976,85 (−2,32%), max drawdown 3,84%</b>. Tabel di bawah adalah
+          10 trade terakhir dari backtest long-only itu — semua barisnya berarah LONG.
+          Pakai <b>filter tanggal</b> di bawah untuk hanya menampilkan trade yang masuk pada tanggal tertentu.
+        </p>
+        <div class="bt-filter" aria-label="Filter tanggal trade long-only">
+          <label for="btLongDateSelect">Filter tanggal</label>
+          <select id="btLongDateSelect" aria-label="Pilih tanggal trade long-only">
+            <option value="all">Semua tanggal</option>
+            <option value="2026-11-20">20 Nov 2026</option>
+            <option value="2026-11-22">22 Nov 2026</option>
+            <option value="2026-11-23">23 Nov 2026</option>
+            <option value="2026-11-24">24 Nov 2026</option>
+          </select>
+          <div class="bt-cal-wrap">
+            <button type="button" class="bt-cal-btn" id="btLongCalBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="btLongCal">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+              <span id="btLongCalBtnText">Kalender</span>
+            </button>
+            <div class="bt-cal-backdrop" id="btLongCalBackdrop" hidden></div>
+            <div class="bt-cal" id="btLongCal" role="dialog" aria-label="Kalender November 2026 — titik hijau menandai tanggal yang ada trade" hidden>
+              <div class="bt-cal-head">November 2026</div>
+              <p class="bt-cal-sub">Tanggal yang bisa dipilih: 17–24 Nov 2026</p>
+              <div class="bt-cal-week" aria-hidden="true"><span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span></div>
+              <div class="bt-cal-grid" id="btLongCalGrid"></div>
+              <p class="bt-cal-legend"><span class="bt-cal-dotmark" aria-hidden="true"></span>Titik hijau = ada trade pada tanggal itu</p>
+              <button type="button" class="bt-cal-clear" id="btLongCalClear">Tampilkan semua tanggal</button>
+            </div>
+          </div>
+          <span class="bt-summary" id="btLongSummary" aria-live="polite"></span>
+        </div>
+        <div class="panel">
+          <table aria-label="10 trade terakhir backtest long-only sebelumnya" id="btLongTable">
+            <thead>
+              <tr><th>Koin</th><th>Arah</th><th>Masuk</th><th>Keluar</th><th>Alasan</th><th class="num">P/L Virtual</th><th class="num">Saldo Setelahnya</th></tr>
+            </thead>
+            <tbody class="mono" style="font-size:13px" id="btLongBody">
+              <tr data-date="2026-11-20" data-pl="7.41"><td data-label="Koin"><b>WCT</b></td><td data-label="Arah"><span class="side side-long">LONG</span></td><td data-label="Masuk">20 Nov 07:00 — $0,02973</td><td data-label="Keluar">20 Nov 11:00 — $0,03088</td><td data-label="Alasan">TP</td><td data-label="P/L Virtual" class="num pos">+$7,41</td><td data-label="Saldo Setelahnya" class="num">$968,98</td></tr>
+              <tr data-date="2026-11-22" data-pl="-4.15"><td data-label="Koin"><b>WCT</b></td><td data-label="Arah"><span class="side side-long">LONG</span></td><td data-label="Masuk">22 Nov 09:00 — $0,02969</td><td data-label="Keluar">23 Nov 01:00 — $0,02910</td><td data-label="Alasan">SL</td><td data-label="P/L Virtual" class="num neg">−$4,15</td><td data-label="Saldo Setelahnya" class="num">$964,83</td></tr>
+              <tr data-date="2026-11-23" data-pl="6.60"><td data-label="Koin"><b>XAU</b></td><td data-label="Arah"><span class="side side-long">LONG</span></td><td data-label="Masuk">23 Nov 00:00 — $3.579,06</td><td data-label="Keluar">23 Nov 01:00 — $3.612,12</td><td data-label="Alasan">TP</td><td data-label="P/L Virtual" class="num pos">+$6,60</td><td data-label="Saldo Setelahnya" class="num">$971,42</td></tr>
+              <tr data-date="2026-11-22" data-pl="7.42"><td data-label="Koin"><b>BTC</b></td><td data-label="Arah"><span class="side side-long">LONG</span></td><td data-label="Masuk">22 Nov 10:00 — $61.135,20</td><td data-label="Keluar">23 Nov 13:00 — $63.185,50</td><td data-label="Alasan">TP</td><td data-label="P/L Virtual" class="num pos">+$7,42</td><td data-label="Saldo Setelahnya" class="num">$978,85</td></tr>
+              <tr data-date="2026-11-23" data-pl="7.43"><td data-label="Koin"><b>ONDO</b></td><td data-label="Arah"><span class="side side-long">LONG</span></td><td data-label="Masuk">23 Nov 05:00 — $0,28506</td><td data-label="Keluar">23 Nov 13:00 — $0,29413</td><td data-label="Alasan">TP</td><td data-label="P/L Virtual" class="num pos">+$7,43</td><td data-label="Saldo Setelahnya" class="num">$986,27</td></tr>
+              <tr data-date="2026-11-23" data-pl="7.42"><td data-label="Koin"><b>SUI</b></td><td data-label="Arah"><span class="side side-long">LONG</span></td><td data-label="Masuk">23 Nov 05:00 — $0,65963</td><td data-label="Keluar">23 Nov 13:00 — $0,68039</td><td data-label="Alasan">TP</td><td data-label="P/L Virtual" class="num pos">+$7,42</td><td data-label="Saldo Setelahnya" class="num">$993,70</td></tr>
+              <tr data-date="2026-11-23" data-pl="-4.28"><td data-label="Koin"><b>WCT</b></td><td data-label="Arah"><span class="side side-long">LONG</span></td><td data-label="Masuk">23 Nov 16:00 — $0,02956</td><td data-label="Keluar">23 Nov 17:00 — $0,02902</td><td data-label="Alasan">SL</td><td data-label="P/L Virtual" class="num neg">−$4,28</td><td data-label="Saldo Setelahnya" class="num">$989,41</td></tr>
+              <tr data-date="2026-11-23" data-pl="-4.21"><td data-label="Koin"><b>SOMI</b></td><td data-label="Arah"><span class="side side-long">LONG</span></td><td data-label="Masuk">23 Nov 15:00 — $0,12012</td><td data-label="Keluar">23 Nov 18:00 — $0,11729</td><td data-label="Alasan">SL</td><td data-label="P/L Virtual" class="num neg">−$4,21</td><td data-label="Saldo Setelahnya" class="num">$985,20</td></tr>
+              <tr data-date="2026-11-24" data-pl="-4.23"><td data-label="Koin"><b>SHIB</b></td><td data-label="Arah"><span class="side side-long">LONG</span></td><td data-label="Masuk">24 Nov 06:00 — $0,000003691</td><td data-label="Keluar">24 Nov 09:00 — $0,000003620</td><td data-label="Alasan">SL</td><td data-label="P/L Virtual" class="num neg">−$4,23</td><td data-label="Saldo Setelahnya" class="num">$980,98</td></tr>
+              <tr data-date="2026-11-24" data-pl="-4.13"><td data-label="Koin"><b>JUP</b></td><td data-label="Arah"><span class="side side-long">LONG</span></td><td data-label="Masuk">24 Nov 06:00 — $0,24275</td><td data-label="Keluar">24 Nov 09:00 — $0,23567</td><td data-label="Alasan">SL</td><td data-label="P/L Virtual" class="num neg">−$4,13</td><td data-label="Saldo Setelahnya" class="num">$976,85</td></tr>
+              <tr id="btLongEmpty" hidden><td colspan="7" style="text-align:center;color:var(--muted);padding:22px 14px">Tidak ada trade long-only yang masuk pada tanggal ini di daftar 10 trade terakhir. Pilih tanggal lain atau “Semua tanggal”.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="sec-sub" style="margin-top:10px">10 trade terakhir dari 20 trade backtest <b>long-only</b> (waktu UTC pada data sumber). Harga di samping waktu Masuk/Keluar adalah harga entry dan exit yang benar-benar dipakai backtest, diambil dari data candle 1 jam. Polanya terlihat jelas: kemenangan TP sekitar +$7,4 dan kekalahan SL sekitar −$4,2, tetapi hanya 5 dari 20 trade yang menang — frekuensi menang yang rendah membuat totalnya tetap rugi. Backtest long + short di atas memperbaiki angka itu sedikit (−1,92% vs −2,32%), bukan membalikkannya jadi untung.</p>
+      </section>
+
+      <!-- Berita & agenda penting -->
+      <section id="berita-agenda" aria-labelledby="berita-title">
+        <h2 id="berita-title">Berita &amp; Agenda Penting</h2>
+        <p class="sec-sub">
+          Pantauan berita besar dan agenda pasar yang bisa menggerakkan harga crypto minggu ini — dikumpulkan di sini
+          supaya mudah dicek sebelum mengambil keputusan di demo. Isi saat ini adalah <b>rangkuman satu postingan</b>,
+          bukan daftar berita yang terpisah-pisah.
+        </p>
+
+        <div class="news-source" role="note">
+          <span class="tag">SNAPSHOT / RANGKUMAN</span>
+          <span>
+            Sumber: <b>Bakul Crypto (@BakulBsc)</b>, akun terverifikasi di X — diposting <b>24 Nov 2026, 20:05 WIB</b>:
+            “BIG WEEK AHEAD: MAJOR CATALYSTS FOR GLOBAL MARKETS &amp; CRYPTO”.
+            Ini <b>snapshot rangkuman per saat postingan itu dibaca</b>, <b>bukan feed berita live otomatis</b> —
+            halaman ini tidak mengambil berita baru sendiri.
+          </span>
+          <a href="https://x.com/BakulBsc/status/2125214184388616358" target="_blank" rel="noopener noreferrer">Baca postingan aslinya di X ↗</a>
+        </div>
+
+        <ol class="news-list">
+          <li class="news-item">
+            <div class="news-date" aria-label="Rabu, 25 November 2026"><span class="dow">Rabu</span><span class="dnum">25</span><span class="dmon">Nov 2026</span></div>
+            <div class="news-body">
+              <h3>Tokenisasi saham AS &amp; laporan Nvidia</h3>
+              <ul>
+                <li><b>Dinari</b> meluncurkan saham AS berbasis token yang bisa diperdagangkan <b>24/7</b>.</li>
+                <li><b>Laporan pendapatan Nvidia Q3</b> — hasil raksasa chip AI ini sering menggerakkan saham teknologi dan aset berisiko secara luas.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="news-item">
+            <div class="news-date" aria-label="Kamis, 26 November 2026"><span class="dow">Kamis</span><span class="dnum">26</span><span class="dmon">Nov 2026</span></div>
+            <div class="news-body">
+              <h3>Data inflasi konsumen AS (US CPI)</h3>
+              <ul>
+                <li>Rilis <b>CPI AS</b> — angka inflasi yang sangat memengaruhi ekspektasi suku bunga The Fed, dolar, dan selera risiko pasar termasuk crypto.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="news-item">
+            <div class="news-date" aria-label="Jumat, 27 November 2026"><span class="dow">Jumat</span><span class="dnum">27</span><span class="dmon">Nov 2026</span></div>
+            <div class="news-body">
+              <h3>Libur Thanksgiving AS — pasar saham tutup</h3>
+              <ul>
+                <li>Pasar saham AS <b>tutup</b> karena Thanksgiving; volume perdagangan berpotensi <b>turun</b>.</li>
+                <li>Dengan likuiditas yang lebih tipis, pergerakan <b>crypto bisa lebih volatil</b> dari biasanya.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="news-item">
+            <div class="news-date" aria-label="Sabtu, 28 November 2026"><span class="dow">Sabtu</span><span class="dnum">28</span><span class="dmon">Nov 2026</span></div>
+            <div class="news-body">
+              <h3>Keputusan suku bunga Bank of Japan</h3>
+              <ul>
+                <li>Bank of Japan memutuskan suku bunga; pasar memperkirakan <b>kemungkinan naik 25 bps ke 0,75%</b>.</li>
+                <li>Kebijakan BoJ berpengaruh ke yen dan arus dana global — keduanya bisa menjalar ke aset berisiko.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="news-item">
+            <div class="news-date" aria-label="Minggu, 29 November 2026"><span class="dow">Minggu</span><span class="dnum">29</span><span class="dmon">Nov 2026</span></div>
+            <div class="news-body">
+              <h3>Sidang Senat AS soal GENIUS Act</h3>
+              <ul>
+                <li><b>Komite Perbankan Senat AS</b> menggelar sidang soal <b>GENIUS Act</b> — rancangan regulasi <b>stablecoin</b> di AS.</li>
+                <li>Kemajuan atau hambatan regulasi stablecoin bisa mengubah sentimen terhadap pasar crypto AS.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="news-item">
+            <div class="news-date" aria-label="Senin, 30 November 2026"><span class="dow">Senin</span><span class="dnum">30</span><span class="dmon">Nov 2026</span></div>
+            <div class="news-body">
+              <h3>Suku bunga Bank of Korea &amp; tenggat Trump Media</h3>
+              <ul>
+                <li><b>Keputusan suku bunga Bank of Korea</b> — satu lagi keputusan bank sentral Asia di minggu yang sama.</li>
+                <li><b>Tenggat Trump Media</b> terkait pinjaman berbasis Bitcoin senilai <b>$1 miliar</b>.</li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+
+        <div class="news-outlook" role="note">
+          <b>Outlook menurut postingan:</b> kombinasi inflasi, keputusan bank sentral, regulasi crypto, dan teknologi
+          berpotensi <b>meningkatkan volatilitas Bitcoin dan altcoin</b> sepanjang 25–30 Nov 2026. Untuk demo ini,
+          agenda di atas adalah bahan pantauan konteks pasar — bukan sinyal entry, dan aturan 4 syarat entry di atas
+          tetap yang menentukan posisi dibuka atau tidak.
+        </div>
+      </section>
+
+      <footer>
+        <p><strong>Penting:</strong> Ini adalah <strong>demo / paper trading</strong>. Saldo, posisi, dan P/L di halaman ini
+        seluruhnya <strong>virtual</strong> — tidak ada uang asli yang dipertaruhkan, tidak ada order yang dieksekusi,
+        dan halaman ini tidak terhubung ke akun exchange mana pun.</p>
+        <p>Panel saldo, posisi, dan trade diperbarui otomatis dari file posisi mesin demo (refresh 60 detik di browser);
+        ringkasan P/L harian demo dikirim ke chat tiap pukul 21:30 WIB.
+        Skor Bias Momentum adalah indikator baca arah, bukan saran keuangan dan bukan jaminan hasil — backtest aturan ini
+        sendiri berakhir rugi (−1,92% dalam 7 hari untuk long + short; −2,32% untuk long-only sebelumnya).
+        Khusus short: di demo ini short hanya simulasi; di trading real short tidak tersedia di Spot dan membutuhkan
+        Futures/margin dengan risiko likuidasi serta biaya funding.</p>
+      </footer>
+
+    </div>
+    </div><!-- /.page-shell -->
+
+    <script>
+      // ===== Navigasi floating: buka/tutup di HP + tandai seksi aktif saat scroll =====
+      (function () {
+        var nav = document.getElementById('floatingNav');
+        var toggle = document.getElementById('navToggle');
+        var closeBtn = document.getElementById('navClose');
+        var backdrop = document.getElementById('navBackdrop');
+        if (!nav || !toggle) return;
+        function isMobile() { return window.matchMedia('(max-width: 1023px)').matches; }
+        function openNav() {
+          nav.classList.add('open');
+          toggle.setAttribute('aria-expanded', 'true');
+          if (backdrop) backdrop.hidden = false;
+        }
+        function closeNav() {
+          nav.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+          if (backdrop) backdrop.hidden = true;
+        }
+        toggle.addEventListener('click', function () {
+          if (nav.classList.contains('open')) closeNav(); else openNav();
+        });
+        if (closeBtn) closeBtn.addEventListener('click', closeNav);
+        if (backdrop) backdrop.addEventListener('click', closeNav);
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeNav(); });
+        var links = Array.prototype.slice.call(nav.querySelectorAll('a[data-target]'));
+        links.forEach(function (a) {
+          a.addEventListener('click', function () { if (isMobile()) closeNav(); });
+        });
+        window.addEventListener('resize', function () { if (!isMobile()) closeNav(); });
+
+        // Scrollspy: tandai menu sesuai seksi yang sedang terlihat
+        var sections = links.map(function (a) { return document.getElementById(a.getAttribute('data-target')); }).filter(Boolean);
+        function setActive(id) {
+          links.forEach(function (a) {
+            var on = a.getAttribute('data-target') === id;
+            a.classList.toggle('active', on);
+            if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+          });
+        }
+        if (sections.length) setActive(sections[0].id);
+        if ('IntersectionObserver' in window) {
+          var seen = {};
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+              if (en.isIntersecting) seen[en.target.id] = en.boundingClientRect.top;
+              else delete seen[en.target.id];
+            });
+            var ids = Object.keys(seen);
+            if (ids.length) {
+              ids.sort(function (x, y) { return Math.abs(seen[x]) - Math.abs(seen[y]); });
+              setActive(ids[0]);
+            }
+          }, { rootMargin: '-12% 0px -62% 0px', threshold: 0 });
+          sections.forEach(function (s) { io.observe(s); });
+        }
+      })();
+    </script>
+    <script>
+      // ===== Filter tanggal: tabel perbandingan backtest LONG-ONLY =====
+      (function () {
+        var sel = document.getElementById('btLongDateSelect');
+        var calBtn = document.getElementById('btLongCalBtn');
+        var calBtnText = document.getElementById('btLongCalBtnText');
+        var cal = document.getElementById('btLongCal');
+        var calGrid = document.getElementById('btLongCalGrid');
+        var calClear = document.getElementById('btLongCalClear');
+        var body = document.getElementById('btLongBody');
+        var summary = document.getElementById('btLongSummary');
+        var emptyRow = document.getElementById('btLongEmpty');
+        if (!sel || !body || !summary) return;
+        var rows = Array.prototype.slice.call(body.querySelectorAll('tr[data-date]'));
+        var LABELS = { '2026-11-20': '20 Nov 2026', '2026-11-22': '22 Nov 2026', '2026-11-23': '23 Nov 2026', '2026-11-24': '24 Nov 2026' };
+        function fmtPL(v) {
+          var abs = Math.abs(v).toFixed(2).replace('.', ',');
+          if (v > 0) return '+$' + abs;
+          if (v < 0) return '\u2212$' + abs;
+          return '$0,00';
+        }
+        function apply(val) {
+          var showAll = !val || val === 'all';
+          var shown = 0, wins = 0, total = 0;
+          rows.forEach(function (r) {
+            var match = showAll || r.getAttribute('data-date') === val;
+            r.style.display = match ? '' : 'none';
+            if (match) {
+              shown++;
+              var pl = parseFloat(r.getAttribute('data-pl')) || 0;
+              total += pl;
+              if (pl > 0) wins++;
+            }
+          });
+          if (emptyRow) emptyRow.hidden = shown !== 0;
+          var scope = showAll ? 'Semua tanggal' : (LABELS[val] || val);
+          var cls = total > 0 ? 'pos' : (total < 0 ? 'neg' : 'neu');
+          summary.innerHTML = 'Menampilkan <b>' + shown + ' dari ' + rows.length + ' trade</b> \u00b7 ' + scope +
+            ' \u00b7 <b>' + wins + ' menang</b> \u00b7 P/L <b class="mono ' + cls + '">' + fmtPL(total) + '</b>';
+        }
+        var currentVal = 'all';
+        function ensureOption(v) {
+          if (!sel.querySelector('option[value="' + v + '"]')) {
+            var opt = document.createElement('option');
+            opt.value = v;
+            var parts = v.split('-');
+            opt.textContent = parts[2].replace(/^0/, '') + ' Nov ' + parts[0];
+            sel.appendChild(opt);
+            LABELS[v] = opt.textContent;
+          }
+        }
+        function setFilter(v) {
+          if (!v || v === 'all') { currentVal = 'all'; sel.value = 'all'; }
+          else { ensureOption(v); currentVal = v; sel.value = v; }
+          if (calBtnText) {
+            if (currentVal === 'all') calBtnText.textContent = 'Kalender';
+            else if (window.matchMedia('(max-width: 640px)').matches) calBtnText.textContent = LABELS[currentVal] || currentVal;
+            else calBtnText.textContent = 'Kalender · ' + (LABELS[currentVal] || currentVal);
+          }
+          if (calGrid) {
+            Array.prototype.forEach.call(calGrid.querySelectorAll('.bt-cal-day'), function (d) {
+              var on = d.getAttribute('data-date') === currentVal;
+              d.classList.toggle('selected', on);
+              if (on) d.setAttribute('aria-current', 'date'); else d.removeAttribute('aria-current');
+            });
+          }
+          apply(currentVal);
+        }
+        sel.addEventListener('change', function () { setFilter(sel.value); });
+
+        // ----- Kalender custom: titik hijau di bawah tanggal yang ada trade -----
+        // Tanggal bertitik diambil dari data trade di tabel (data-date), bukan diketik manual.
+        var tradeDates = {};
+        rows.forEach(function (r) { tradeDates[r.getAttribute('data-date')] = true; });
+        var CAL_MIN = '2026-11-17', CAL_MAX = '2026-11-24';
+        function buildCalendar() {
+          if (!calGrid) return;
+          calGrid.innerHTML = '';
+          // November 2026: tanggal 1 jatuh pada hari Minggu, jadi grid mulai dari kolom pertama.
+          for (var day = 1; day <= 30; day++) {
+            var ds = '2026-11-' + (day < 10 ? '0' + day : '' + day);
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'bt-cal-day';
+            b.setAttribute('data-date', ds);
+            var num = document.createElement('span');
+            num.className = 'bt-cal-num';
+            num.textContent = day;
+            b.appendChild(num);
+            var dot = document.createElement('span');
+            dot.className = 'bt-cal-dotmark';
+            dot.setAttribute('aria-hidden', 'true');
+            b.appendChild(dot);
+            if (tradeDates[ds]) {
+              b.classList.add('has-trade');
+              b.setAttribute('aria-label', day + ' November 2026 — ada trade');
+            } else {
+              b.setAttribute('aria-label', day + ' November 2026');
+            }
+            if (ds < CAL_MIN || ds > CAL_MAX) { b.disabled = true; }
+            else {
+              b.addEventListener('click', function () { setFilter(this.getAttribute('data-date')); closeCal(); });
+            }
+            calGrid.appendChild(b);
+          }
+        }
+        var calBackdrop = document.getElementById('btLongCalBackdrop');
+        function openCal() { if (!cal) return; cal.hidden = false; if (calBackdrop) calBackdrop.hidden = false; if (calBtn) calBtn.setAttribute('aria-expanded', 'true'); }
+        function closeCal() { if (!cal) return; cal.hidden = true; if (calBackdrop) calBackdrop.hidden = true; if (calBtn) calBtn.setAttribute('aria-expanded', 'false'); }
+        if (calBtn && cal) {
+          buildCalendar();
+          calBtn.addEventListener('click', function () { if (cal.hidden) openCal(); else closeCal(); });
+          if (calBackdrop) calBackdrop.addEventListener('click', closeCal);
+          document.addEventListener('click', function (e) {
+            if (!cal.hidden && !cal.contains(e.target) && !calBtn.contains(e.target)) closeCal();
+          });
+          document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeCal(); });
+          if (calClear) calClear.addEventListener('click', function () { setFilter('all'); closeCal(); });
+        }
+        setFilter('all');
+      })();
+    </script>
+    <script>
+      // ===== Demo Trading 18 — Bias Momentum LIVE (rumus sama seperti Market Move & engine demo) =====
+      // Data: API publik tanpa key. Binance Spot -> Binance US -> OKX -> Gate.io.
+      var COINS = [
+        { s: 'BTC',   name: 'Bitcoin',        snap: 32 },
+        { s: 'ETH',   name: 'Ethereum',       snap: 37 },
+        { s: 'BNB',   name: 'BNB',            snap: 37 },
+        { s: 'ENA',   name: 'Ethena',         snap: 27 },
+        { s: 'ONDO',  name: 'Ondo',           snap: 25 },
+        { s: 'XAU',   name: 'Emas (PAXG)',    snap: 40, binance: 'PAXGUSDT', okx: 'PAXG', gate: 'PAXG' },
+        { s: 'SHIB',  name: 'Shiba Inu',      snap: 37 },
+        { s: 'PENGU', name: 'Pudgy Penguins', snap: 20 },
+        { s: 'SUI',   name: 'Sui',            snap: 32 },
+        { s: 'XPL',   name: 'Plasma',         snap: 34, noUS: true },
+        { s: 'PUMP',  name: 'Pump.fun',       snap: 24 },
+        { s: 'PYTH',  name: 'Pyth Network',   snap: 25, noUS: true },
+        { s: 'ZEC',   name: 'Zcash',          snap: 30 },
+        { s: 'ASTER', name: 'Aster',          snap: 30 },
+        { s: 'JUP',   name: 'Jupiter',        snap: 19 },
+        { s: 'HYPE',  name: 'Hyperliquid',    snap: 27 },
+        { s: 'WCT',   name: 'WalletConnect',  snap: 22, noUS: true },
+        { s: 'SOMI',  name: 'Somnia',         snap: 23, noUS: true, noOKX: true }
+      ];
+      var GATE = 55, GATE_SHORT = 45, REFRESH_S = 60;
+
+      function binSym(c) { return c.binance || (c.s + 'USDT'); }
+      function okxBase(c) { return c.okx || c.s; }
+      function gateBase(c) { return c.gate || c.s; }
+
+      function fetchJson(url, ms) {
+        ms = ms || 9000;
+        var ctl = new AbortController();
+        var to = setTimeout(function () { ctl.abort(); }, ms);
+        return fetch(url, { signal: ctl.signal }).then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        }).finally(function () { clearTimeout(to); });
+      }
+      function parseBinance(arr) { return arr.map(function (k) { return { t: k[0], o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5] }; }); }
+      function parseOKX(arr) { return arr.slice().reverse().map(function (k) { return { t: +k[0], o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5] }; }); }
+      function parseGate(arr) { return arr.map(function (k) { return { t: +k[0] * 1000, v: +k[1], c: +k[2], h: +k[3], l: +k[4], o: +k[5] }; }); }
+
+      var SOURCES = [
+        { label: 'Binance Spot', ok: function () { return true; },
+          m1: function (c) { return fetchJson('https://data-api.binance.vision/api/v3/klines?symbol=' + binSym(c) + '&interval=1m&limit=300').then(parseBinance); },
+          h1: function (c) { return fetchJson('https://data-api.binance.vision/api/v3/klines?symbol=' + binSym(c) + '&interval=1h&limit=120').then(parseBinance); } },
+        { label: 'Binance US', ok: function (c) { return !c.noUS; },
+          m1: function (c) { return fetchJson('https://api.binance.us/api/v3/klines?symbol=' + binSym(c) + '&interval=1m&limit=300').then(parseBinance); },
+          h1: function (c) { return fetchJson('https://api.binance.us/api/v3/klines?symbol=' + binSym(c) + '&interval=1h&limit=120').then(parseBinance); } },
+        { label: 'OKX', ok: function (c) { return !c.noOKX; },
+          m1: function (c) { return fetchJson('https://www.okx.com/api/v5/market/candles?instId=' + okxBase(c) + '-USDT&bar=1m&limit=300').then(function (j) { if (j.code !== '0' || !j.data || !j.data.length) throw new Error('OKX kosong'); return parseOKX(j.data); }); },
+          h1: function (c) { return fetchJson('https://www.okx.com/api/v5/market/candles?instId=' + okxBase(c) + '-USDT&bar=1H&limit=120').then(function (j) { if (j.code !== '0' || !j.data || !j.data.length) throw new Error('OKX kosong'); return parseOKX(j.data); }); } },
+        { label: 'Gate.io', ok: function () { return true; },
+          m1: function (c) { return fetchJson('https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=' + gateBase(c) + '_USDT&interval=1m&limit=300').then(parseGate); },
+          h1: function (c) { return fetchJson('https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=' + gateBase(c) + '_USDT&interval=1h&limit=120').then(parseGate); } }
+      ];
+
+      function fetchM1(coin) {
+        var chain = Promise.reject(new Error('start'));
+        SOURCES.forEach(function (src) {
+          if (!src.ok(coin)) return;
+          chain = chain.catch(function () {
+            return src.m1(coin).then(function (m1) {
+              if (!m1 || m1.length < 60) throw new Error('data kurang');
+              return { m1: m1, source: src.label };
+            });
+          });
+        });
+        return chain;
+      }
+      function fetchH1(coin) {
+        var chain = Promise.reject(new Error('start'));
+        SOURCES.forEach(function (src) {
+          if (!src.ok(coin)) return;
+          chain = chain.catch(function () {
+            return src.h1(coin).then(function (h1) {
+              if (!h1 || h1.length < 55) throw new Error('data 1 jam kurang');
+              return h1;
+            });
+          });
+        });
+        return chain;
+      }
+
+      // ----- Indikator: persis rumus Market Move (dipakai juga oleh engine demo) -----
+      function emaSeriesMM(vals, p) {
+        var k = 2 / (p + 1), out = [], e = null;
+        for (var i = 0; i < vals.length; i++) { e = (e === null) ? vals[i] : vals[i] * k + e * (1 - k); out.push(e); }
+        return out;
+      }
+      function rsiWilder(closes, p) {
+        p = p || 14;
+        if (closes.length <= p) return null;
+        var g = 0, l = 0, i, d;
+        for (i = 1; i <= p; i++) { d = closes[i] - closes[i - 1]; if (d > 0) g += d; else l -= d; }
+        g /= p; l /= p;
+        for (i = p + 1; i < closes.length; i++) {
+          d = closes[i] - closes[i - 1];
+          g = (g * (p - 1) + (d > 0 ? d : 0)) / p;
+          l = (l * (p - 1) + (d < 0 ? -d : 0)) / p;
+        }
+        if (l === 0) return 100;
+        return 100 - 100 / (1 + g / l);
+      }
+      function biasScore(closes, price) {
+        var e20 = emaSeriesMM(closes, 20), e50 = emaSeriesMM(closes, 50);
+        var rsi = rsiWilder(closes, 14);
+        var open1h = closes.length > 60 ? closes[closes.length - 61] : closes[0];
+        var chg1h = (price - open1h) / open1h * 100;
+        var score = 50;
+        if (rsi !== null) score += (rsi - 50) * 0.55;
+        if (e50[e50.length - 1] !== 0) score += Math.max(-14, Math.min(14, (e20[e20.length - 1] - e50[e50.length - 1]) / e50[e50.length - 1] * 2200));
+        score += (price > e20[e20.length - 1]) ? 6 : -6;
+        score += Math.max(-12, Math.min(12, chg1h * 1.6));
+        return {
+          bias: Math.max(2, Math.min(98, Math.round(score))),
+          rsi1m: rsi === null ? null : Math.round(rsi * 10) / 10,
+          chg1h: Math.round(chg1h * 100) / 100
+        };
+      }
+
+      // ----- Format -----
+      function fmtPrice(p) {
+        if (p === null || p === undefined || !isFinite(p)) return '—';
+        if (p >= 1000) return '$' + p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (p >= 1) return '$' + p.toFixed(4);
+        if (p >= 0.01) return '$' + p.toFixed(5);
+        return '$' + Number(p.toPrecision(3)).toString();
+      }
+      function fmtPct(v) {
+        if (v === null || v === undefined || !isFinite(v)) return '—';
+        return (v > 0 ? '+' : '') + v.toFixed(2) + '%';
+      }
+      function biasClass(b) { return b > GATE ? 'bull' : (b >= GATE_SHORT ? 'mid' : 'bear'); }
+      function biasWord(b) { return b > GATE ? 'Condong long' : (b >= GATE_SHORT ? 'Netral' : 'Condong short'); }
+
+      // ----- Bangun kartu koin -----
+      var grid = document.getElementById('coinGrid');
+      COINS.forEach(function (c) {
+        var el = document.createElement('article');
+        el.className = 'coin';
+        el.id = 'coin-' + c.s;
+        el.innerHTML =
+          '<div class="coin-top">' +
+            '<div><span class="coin-sym">' + c.s + '</span><span class="coin-name">' + c.name + '</span></div>' +
+            '<div><div class="coin-price mono" data-f="price">—</div><div class="coin-chg mono" data-f="chg">1 jam: —</div></div>' +
+          '</div>' +
+          '<div class="bias-row">' +
+            '<div class="bias-num mono" data-f="bias">–</div>' +
+            '<div style="flex:1">' +
+              '<div class="bias-track"><div class="bias-fill" data-f="fill"></div><div class="bias-gate bias-gate-short" title="Gate short 45"></div><div class="bias-gate" title="Gate long 55"></div></div>' +
+              '<div class="bias-scale"><span>0 · short</span><span>gate 45 · 55</span><span>100 · long</span></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="coin-meta">' +
+            '<span data-f="word">Menunggu data live…</span>' +
+            '<span>RSI 1m: <b class="mono" data-f="rsi">—</b></span>' +
+            '<span>Snapshot 18:17: <b class="mono">' + c.snap + '</b></span>' +
+            '<span data-f="src"></span>' +
+            '<span data-f="gate"></span>' +
+          '</div>';
+        grid.appendChild(el);
+      });
+      function field(sym, f) { return document.querySelector('#coin-' + sym + ' [data-f="' + f + '"]'); }
+
+      function renderCoin(c, res) {
+        var b = res.bias;
+        var cls = biasClass(b);
+        var biasEl = field(c.s, 'bias');
+        biasEl.textContent = b;
+        biasEl.className = 'bias-num mono bias-' + cls;
+        var fill = field(c.s, 'fill');
+        fill.style.width = b + '%';
+        fill.className = 'bias-fill fill-' + cls;
+        field(c.s, 'price').textContent = fmtPrice(res.price);
+        var chgEl = field(c.s, 'chg');
+        chgEl.textContent = '1 jam: ' + fmtPct(res.chg1h);
+        chgEl.className = 'coin-chg mono ' + (res.chg1h > 0 ? 'pos' : (res.chg1h < 0 ? 'neg' : 'neu'));
+        field(c.s, 'rsi').textContent = res.rsi1m === null ? '—' : res.rsi1m.toFixed(1);
+        field(c.s, 'word').innerHTML = '<b>' + biasWord(b) + '</b>';
+        field(c.s, 'src').textContent = 'Sumber: ' + res.source;
+        field(c.s, 'gate').innerHTML = b > GATE
+          ? '<span class="gate-tag gate-yes">LOLOS GATE LONG &gt; 55</span>'
+          : (b < GATE_SHORT
+            ? '<span class="gate-tag gate-short">LOLOS GATE SHORT &lt; 45</span>'
+            : '<span class="gate-tag gate-no">NETRAL — TANPA GATE</span>');
+      }
+      // ----- Ceklis 4 syarat entry per koin (candle 1 jam yang sudah tutup) -----
+      var gateGrid = document.getElementById('gateGrid');
+      COINS.forEach(function (c) {
+        var el = document.createElement('article');
+        el.className = 'coin';
+        el.id = 'gate-' + c.s;
+        el.innerHTML =
+          '<div class="coin-top">' +
+            '<div><span class="coin-sym">' + c.s + '</span><span class="coin-name">' + c.name + '</span></div>' +
+            '<span class="ready-tag" data-g="ready">MENUNGGU DATA…</span>' +
+          '</div>' +
+          '<div class="chk-row"><span class="chk-side pos">LONG</span><span data-g="long"></span></div>' +
+          '<div class="chk-row"><span class="chk-side neg">SHORT</span><span data-g="short"></span></div>' +
+          '<div class="coin-meta"><span data-g="note">Mengambil candle 1 jam…</span></div>';
+        gateGrid.appendChild(el);
+      });
+      function gfield(sym, f) { return document.querySelector('#gate-' + sym + ' [data-g="' + f + '"]'); }
+      function chip(ok, label) {
+        return '<span class="chk ' + (ok ? 'ok' : 'no') + '"><span class="lamp"></span>' + label + '</span>';
+      }
+      function gateChecks(h1, bias) {
+        var closed = h1.slice(0, h1.length - 1); // buang candle 1 jam yang masih berjalan
+        var closes = closed.map(function (k) { return k.c; });
+        var e9 = emaSeriesMM(closes, 9), e21 = emaSeriesMM(closes, 21), e50 = emaSeriesMM(closes, 50);
+        var i = closes.length - 1;
+        var rsi = rsiWilder(closes, 14);
+        return {
+          e9: e9[i], e21: e21[i], e50: e50[i], close: closes[i], rsi1h: rsi,
+          crossUp: e9[i - 1] <= e21[i - 1] && e9[i] > e21[i],
+          crossDown: e9[i - 1] >= e21[i - 1] && e9[i] < e21[i],
+          aboveEma: e9[i] > e21[i]
+        };
+      }
+      function renderGate(c, bias, g) {
+        var rsiTxt = g.rsi1h === null ? '—' : g.rsi1h.toFixed(1).replace('.', ',');
+        var crossLong = g.crossUp ? 'Cross-up terjadi di candle ini'
+          : (g.aboveEma ? 'EMA9 di atas EMA21, tanpa cross baru' : 'EMA9 ' + fmtPrice(g.e9) + ' &lt; EMA21 ' + fmtPrice(g.e21));
+        var crossShort = g.crossDown ? 'Cross-down terjadi di candle ini'
+          : (!g.aboveEma ? 'EMA9 di bawah EMA21, tanpa cross baru' : 'EMA9 ' + fmtPrice(g.e9) + ' &gt; EMA21 ' + fmtPrice(g.e21));
+        var L = { bias: bias > GATE, cross: g.crossUp, ema50: g.close > g.e50, rsi: g.rsi1h !== null && g.rsi1h <= 70 };
+        var S = { bias: bias < GATE_SHORT, cross: g.crossDown, ema50: g.close < g.e50, rsi: g.rsi1h !== null && g.rsi1h >= 30 };
+        var nL = (L.bias ? 1 : 0) + (L.cross ? 1 : 0) + (L.ema50 ? 1 : 0) + (L.rsi ? 1 : 0);
+        var nS = (S.bias ? 1 : 0) + (S.cross ? 1 : 0) + (S.ema50 ? 1 : 0) + (S.rsi ? 1 : 0);
+        gfield(c.s, 'long').innerHTML =
+          chip(L.bias, 'Bias ' + bias + ' &gt; 55') +
+          chip(L.cross, crossLong) +
+          chip(L.ema50, 'Close ' + fmtPrice(g.close) + (g.close > g.e50 ? ' &gt; ' : ' &lt; ') + 'EMA50 ' + fmtPrice(g.e50)) +
+          chip(L.rsi, 'RSI ' + rsiTxt + ' ≤ 70');
+        gfield(c.s, 'short').innerHTML =
+          chip(S.bias, 'Bias ' + bias + ' &lt; 45') +
+          chip(S.cross, crossShort) +
+          chip(S.ema50, 'Close ' + fmtPrice(g.close) + (g.close < g.e50 ? ' &lt; ' : ' &gt; ') + 'EMA50 ' + fmtPrice(g.e50)) +
+          chip(S.rsi, 'RSI ' + rsiTxt + ' ≥ 30');
+        var ready = gfield(c.s, 'ready');
+        if (nL === 4) { ready.textContent = 'SIAP LONG — 4/4 LOLOS'; ready.className = 'ready-tag ready-long'; }
+        else if (nS === 4) { ready.textContent = 'SIAP SHORT — 4/4 LOLOS'; ready.className = 'ready-tag ready-short'; }
+        else { ready.textContent = 'LONG ' + nL + '/4 · SHORT ' + nS + '/4'; ready.className = 'ready-tag'; }
+        gfield(c.s, 'note').textContent = 'Dinilai pada candle 1 jam terakhir yang sudah tutup.';
+      }
+      function renderGateError(c, msg) {
+        var ready = gfield(c.s, 'ready');
+        ready.textContent = 'GAGAL DIMUAT'; ready.className = 'ready-tag';
+        gfield(c.s, 'long').innerHTML = '';
+        gfield(c.s, 'short').innerHTML = '';
+        gfield(c.s, 'note').textContent = msg;
+      }
+
+      function renderCoinError(c) {
+        var biasEl = field(c.s, 'bias');
+        biasEl.textContent = '–';
+        biasEl.className = 'bias-num mono neu';
+        field(c.s, 'fill').style.width = '0%';
+        field(c.s, 'price').textContent = '—';
+        field(c.s, 'chg').textContent = '1 jam: —';
+        field(c.s, 'rsi').textContent = '—';
+        field(c.s, 'word').innerHTML = '<span class="coin-err">GAGAL DIMUAT</span>';
+        field(c.s, 'src').textContent = 'Semua sumber gagal — skor snapshot di kanan tetap ditampilkan.';
+        field(c.s, 'gate').innerHTML = '';
+      }
+
+      // ----- Siklus refresh -----
+      var statusEl = document.getElementById('liveStatus');
+      var statusText = document.getElementById('liveStatusText');
+      var metaEl = document.getElementById('liveMeta');
+      var clockEl = document.getElementById('liveClock');
+      var btn = document.getElementById('refreshBtn');
+      var refreshing = false, countdown = REFRESH_S, lastOk = 0, lastTotal = 0;
+
+      function setStatus(kind, text) {
+        statusEl.className = 'live-status ' + kind;
+        statusText.textContent = text;
+      }
+      function wibNow() {
+        try {
+          return new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
+        } catch (e) {
+          return new Date().toLocaleTimeString('id-ID') + ' WIB';
+        }
+      }
+
+      function refreshAll() {
+        if (refreshing) return;
+        refreshing = true;
+        btn.disabled = true;
+        setStatus('loading', 'MEMUAT DATA…');
+        metaEl.textContent = 'Mengambil candle 1 menit untuk 18 koin…';
+        var done = 0, okCount = 0, longGate = 0, shortGate = 0;
+        var jobs = COINS.map(function (c) {
+          return fetchM1(c).then(function (r) {
+            var closes = r.m1.map(function (k) { return k.c; });
+            var price = closes[closes.length - 1];
+            var res = biasScore(closes, price);
+            res.price = price; res.source = r.source;
+            renderCoin(c, res);
+            okCount++; if (res.bias > GATE) longGate++; else if (res.bias < GATE_SHORT) shortGate++;
+            return fetchH1(c).then(function (h1) {
+              renderGate(c, res.bias, gateChecks(h1, res.bias));
+            }).catch(function () {
+              renderGateError(c, 'Candle 1 jam gagal dimuat — ceklis syarat belum bisa dinilai.');
+            });
+          }).catch(function () {
+            renderCoinError(c);
+            renderGateError(c, 'Data live gagal dimuat — ceklis syarat belum bisa dinilai.');
+          }).finally(function () {
+            done++;
+            metaEl.textContent = 'Memuat ' + done + ' / ' + COINS.length + ' koin…';
+          });
+        });
+        return Promise.all(jobs).then(function () {
+          refreshing = false;
+          btn.disabled = false;
+          countdown = REFRESH_S;
+          lastOk = okCount; lastTotal = COINS.length;
+          if (okCount === 0) {
+            setStatus('err', 'GAGAL DIMUAT');
+            metaEl.textContent = 'Semua sumber data gagal dihubungi. Skor snapshot 18:17 WIB tetap tampil di tiap kartu. Coba lagi sebentar.';
+          } else {
+            setStatus('ok', 'DATA LIVE');
+            metaEl.textContent = okCount + ' / ' + COINS.length + ' koin berhasil dimuat · ' + longGate + ' koin lolos gate LONG > 55 · ' + shortGate + ' koin lolos gate SHORT < 45 · diperbarui ' + wibNow();
+          }
+          clockEl.textContent = 'Auto-refresh 60 dtk';
+        });
+      }
+
+      btn.addEventListener('click', function () { refreshAll(); });
+      setInterval(function () {
+        if (refreshing) return;
+        countdown--;
+        if (countdown <= 0) { refreshAll(); return; }
+        if (lastOk > 0) clockEl.textContent = 'Auto-refresh dalam ' + countdown + ' dtk';
+      }, 1000);
+
+      refreshAll();
+    </script>
+    <script>
+      // ===== Posisi Terbuka LIVE — daftar posisi dari file posisi mesin demo (GitHub Pages) =====
+      // File diperbarui mesin demo; halaman mengambilnya ulang tiap 60 detik.
+      // Harga sekarang & P/L mengambang dihitung dari candle live (fetchM1 di skrip Bias di atas).
+      // Bila fetch gagal, data terakhir yang berhasil dimuat tetap ditampilkan — tidak pernah dikosongkan.
+      (function () {
+        var POS_URL = 'https://danryu655-ship-it.github.io/market-move/demo-positions.json';
+        var grid = document.getElementById('posGrid');
+        if (!grid) return;
+        var statusEl = document.getElementById('posStatus');
+        var statusText = document.getElementById('posStatusText');
+        var metaEl = document.getElementById('posMeta');
+        var totalEl = document.getElementById('posTotal');
+
+        // Data awal = posisi terakhir yang terverifikasi dari file mesin (24/11/2026, 21:24:48 WIB),
+        // harga tercatat 21:28 WIB. Langsung diganti begitu fetch pertama berhasil.
+        var lastData = {
+          updatedAtWib: '24/11/2026, 21:24:48', balance: 1000,
+          daily: { date: '2026-11-24', realizedPnl: 0 }, trades: [],
+          positions: [
+            { coin: 'SOMI', pair: 'SOMIUSDT', side: 'short', entry: 0.113767, qty: 1848.53, sl: 0.115931, tp: 0.109439, riskUsd: 4, bias: 34, rsi1h: 45.5, openedAt: '2026-11-24T12:29:17.282Z', source: 'Gate.io' },
+            { coin: 'XAU', pair: 'PAXGUSDT', side: 'short', entry: 3608.88, qty: 0.148613, sl: 3635.79, tp: 3555.05, riskUsd: 4, bias: 38, rsi1h: 43.5, openedAt: '2026-11-24T14:13:57.004Z', source: 'Binance Spot' }
+          ]
+        };
+        var prices = {
+          SOMI: { price: 0.1139, source: 'Binance Spot', live: false },
+          XAU: { price: 3612.58, source: 'Binance Spot', live: false }
+        };
+        var priceBusy = false;
+
+        // Tutup manual: koin yang perintah tutupnya sudah disalin di sesi ini.
+        // Hanya label tampilan — posisi & angka TIDAK diubah; mesin yang menutup.
+        var closeRequested = {};
+        var closeTarget = null; // posisi yang sedang dikonfirmasi, atau 'ALL'
+        var modalEl = document.getElementById('closeModal');
+        var backdropEl = document.getElementById('closeBackdrop');
+        var confirmView = document.getElementById('closeConfirmView');
+        var doneView = document.getElementById('closeDoneView');
+        var modalTitle = document.getElementById('closeModalTitle');
+        var modalRows = document.getElementById('closeModalRows');
+        var doneText = document.getElementById('closeDoneText');
+        var cmdText = document.getElementById('closeCmdText');
+
+        function esc(s) {
+          return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, function (ch) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+          });
+        }
+        function numID(v, dec) {
+          return v.toLocaleString('id-ID', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+        }
+        function fmtPriceID(p) {
+          if (p === null || p === undefined || !isFinite(p)) return '—';
+          if (p >= 1000) return '$' + numID(p, 2);
+          if (p >= 1) return '$' + p.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+          return '$' + p.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+        }
+        function fmtUsdID(v) {
+          if (v === null || v === undefined || !isFinite(v)) return '—';
+          if (Math.abs(v) < 0.005) return '$0,00';
+          return (v < 0 ? '−$' : '+$') + numID(Math.abs(v), 2);
+        }
+        function fmtUsdPlain(v) {
+          if (v === null || v === undefined || !isFinite(v)) return '—';
+          return (v < 0 ? '−$' : '$') + numID(Math.abs(v), 2);
+        }
+        function fmtQtyID(q) { return q.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 6 }); }
+        function fmtRID(r) {
+          if (r === null || !isFinite(r)) return '';
+          return (r < 0 ? '−' : '+') + numID(Math.abs(r), 2) + 'R';
+        }
+        function openWib(iso) {
+          var d = new Date(iso);
+          if (isNaN(d.getTime())) return esc(iso);
+          try {
+            var parts = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(d);
+            var m = {};
+            parts.forEach(function (p) { m[p.type] = p.value; });
+            return m.day + ' ' + m.month + ' ' + m.year + ', ' + m.hour + ':' + m.minute + ' WIB';
+          } catch (e) { return esc(iso); }
+        }
+        function setText(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; }
+        function setStatus(kind, text) {
+          if (!statusEl) return;
+          statusEl.className = 'live-status ' + kind;
+          statusText.textContent = text;
+        }
+        function coinObj(sym) {
+          if (typeof COINS === 'undefined') return null;
+          for (var i = 0; i < COINS.length; i++) if (COINS[i].s === sym) return COINS[i];
+          return null;
+        }
+        function coinName(sym) { var c = coinObj(sym); return c ? c.name : ''; }
+        function plOf(pos, price) {
+          return pos.side === 'long' ? (price - pos.entry) * pos.qty : (pos.entry - price) * pos.qty;
+        }
+        function tradePnl(t) {
+          if (t.pnl !== null && t.pnl !== undefined) return +t.pnl;
+          if (t.pl !== null && t.pl !== undefined) return +t.pl;
+          if (t.realizedPnl !== null && t.realizedPnl !== undefined) return +t.realizedPnl;
+          return 0;
+        }
+
+        function render() {
+          if (!lastData) return;
+          var positions = lastData.positions || [];
+          var totalPl = 0, allPriced = positions.length > 0;
+          if (!positions.length) {
+            grid.innerHTML = '<div class="panel" style="grid-column:1/-1;margin-top:0"><div class="empty">' +
+              '<div class="big">0 posisi terbuka</div>' +
+              'Menurut data mesin demo terakhir (per ' + esc(lastData.updatedAtWib || '—') + ' WIB), saat ini memang tidak ada posisi paper yang berjalan.</div></div>';
+            totalEl.innerHTML = '<span>Total P/L mengambang · tidak ada posisi terbuka</span><span class="t-val mono neu">$0,00</span>';
+          } else {
+            grid.innerHTML = positions.map(function (pos) {
+              var pr = prices[pos.coin];
+              var price = pr ? pr.price : null;
+              var pl = price !== null && price !== undefined ? plOf(pos, price) : null;
+              if (pl === null) allPriced = false; else totalPl += pl;
+              var r = (pl !== null && pos.riskUsd) ? pl / pos.riskUsd : null;
+              var isLong = pos.side === 'long';
+              var riskPct = lastData.balance ? (pos.riskUsd / lastData.balance * 100) : 0;
+              var priceNote = !pr ? '<small>· menunggu data live…</small>'
+                : '<small>· ' + (pr.live ? 'live' : 'terakhir tercatat') + ' · ' + esc(pr.source) + '</small>';
+              return '<article class="pos-card">' +
+                '<div class="pos-head"><div>' +
+                  '<span class="pos-sym">' + esc(pos.coin) + '</span><span class="pos-name">' + esc(coinName(pos.coin)) + ' · ' + esc(pos.pair || '') + '</span>' +
+                  '<div class="pos-open">Dibuka ' + openWib(pos.openedAt) + '</div>' +
+                '</div><span class="side ' + (isLong ? 'side-long' : 'side-short') + '">' + (isLong ? 'LONG' : 'SHORT') + '</span></div>' +
+                '<div class="pos-plrow"><div>' +
+                  '<div class="pos-pl-label">P/L Virtual Mengambang</div>' +
+                  '<div class="pos-pl-sub">' + (pl === null ? 'menunggu harga live…' : fmtRID(r) + ' dari risiko ' + fmtUsdPlain(pos.riskUsd)) + '</div>' +
+                '</div><div class="pos-pl-val mono ' + (pl === null ? 'neu' : (pl > 0 ? 'pos' : (pl < 0 ? 'neg' : 'neu'))) + '">' + (pl === null ? '—' : fmtUsdID(pl)) + '</div></div>' +
+                '<div class="pos-rows">' +
+                  '<div class="pos-row"><span class="k">Entry</span><span class="v mono">' + fmtPriceID(pos.entry) + '</span></div>' +
+                  '<div class="pos-row"><span class="k">Harga Sekarang</span><span class="v mono">' + fmtPriceID(price) + ' ' + priceNote + '</span></div>' +
+                  '<div class="pos-row"><span class="k">Stop Loss</span><span class="v mono">' + fmtPriceID(pos.sl) + '</span></div>' +
+                  '<div class="pos-row"><span class="k">Take Profit</span><span class="v mono">' + fmtPriceID(pos.tp) + '</span></div>' +
+                  '<div class="pos-row"><span class="k">Jumlah</span><span class="v mono">' + fmtQtyID(pos.qty) + ' ' + esc(pos.coin) + '</span></div>' +
+                  '<div class="pos-row"><span class="k">Risiko</span><span class="v mono">' + fmtUsdPlain(pos.riskUsd) + ' <small>(' + numID(riskPct, 1) + '% saldo)</small></span></div>' +
+                  '<div class="pos-row"><span class="k">Sinyal Saat Dibuka</span><span class="v">Bias ' + esc(pos.bias) + ' · RSI 1 jam ' + esc(String(pos.rsi1h).replace('.', ',')) + ' · sumber ' + esc(pos.source) + '</span></div>' +
+                '</div>' +
+                (closeRequested[pos.coin] ? '<div class="pos-pending">Permintaan tutup disalin — menunggu mesin menutup posisi ini (alasan MANUAL-CLOSE).</div>' : '') +
+                '<button type="button" class="pos-close-btn" data-close-coin="' + esc(pos.coin) + '">Tutup Sekarang</button>' +
+              '</article>';
+            }).join('');
+            totalEl.innerHTML = '<span>Total P/L mengambang · ' + positions.length + ' posisi terbuka</span>' +
+              '<span class="t-val mono ' + (!allPriced ? 'neu' : (totalPl > 0 ? 'pos' : (totalPl < 0 ? 'neg' : 'neu'))) + '">' +
+              (allPriced ? fmtUsdID(totalPl) : 'menghitung…') + '</span>' +
+              (positions.length > 1 ? '<button type="button" class="pos-close-all" data-close-all="1">Tutup Semua Posisi</button>' : '');
+            // Label "menunggu mesin" hanya untuk posisi yang masih terbuka di data terbaru.
+            Object.keys(closeRequested).forEach(function (c) {
+              if (!positions.some(function (p) { return p.coin === c; })) delete closeRequested[c];
+            });
+          }
+          renderKpis(positions, totalPl, allPriced);
+        }
+
+        function renderKpis(positions, totalPl, allPriced) {
+          var trades = lastData.trades || [];
+          var realized = trades.reduce(function (a, t) { return a + tradePnl(t); }, 0);
+          setText('kpiBalance', fmtUsdPlain(lastData.balance));
+          var totalEl2 = document.getElementById('kpiTotalPl');
+          if (totalEl2) {
+            totalEl2.textContent = fmtUsdID(realized);
+            totalEl2.className = 'value mono ' + (realized > 0 ? 'pos' : (realized < 0 ? 'neg' : 'neu'));
+          }
+          setText('kpiTotalPlSub', (realized > 0 ? '+' : '') + numID(realized / 10, 2) + '% dari modal awal');
+          var today = lastData.daily && lastData.daily.realizedPnl !== null && lastData.daily.realizedPnl !== undefined ? +lastData.daily.realizedPnl : realized;
+          var todayEl = document.getElementById('kpiTodayPl');
+          if (todayEl) {
+            todayEl.textContent = fmtUsdID(today);
+            todayEl.className = 'value mono ' + (today > 0 ? 'pos' : (today < 0 ? 'neg' : 'neu'));
+          }
+          var posCount = document.getElementById('kpiPosCount');
+          if (posCount) posCount.innerHTML = positions.length + ' <span style="font-size:14px;color:var(--faint)">/ maks 3</span>';
+          setText('kpiPosSub', positions.length
+            ? positions.map(function (p) { return (p.side === 'long' ? 'LONG ' : 'SHORT ') + p.coin; }).join(' · ') + (allPriced ? ' · P/L mengambang ' + fmtUsdID(totalPl) : '')
+            : 'Tidak ada posisi saat ini');
+          setText('kpiTradeCount', String(trades.length));
+          setText('kpiTradeSub', trades.length ? 'Total P/L ' + fmtUsdID(realized) : 'Belum ada trade yang ditutup');
+          var wins = trades.filter(function (t) { return tradePnl(t) > 0; }).length;
+          var wrEl = document.getElementById('kpiWinRate');
+          if (wrEl) {
+            wrEl.textContent = trades.length ? numID(wins / trades.length * 100, 0) + '%' : '—';
+            wrEl.className = 'value mono' + (trades.length ? '' : ' neu');
+          }
+          setText('kpiWinSub', trades.length ? wins + ' menang dari ' + trades.length + ' trade selesai' : 'Belum ada trade yang ditutup');
+        }
+
+        function renderTrades() {
+          var body = document.getElementById('tradesBody');
+          if (!body || !lastData) return;
+          var trades = lastData.trades || [];
+          if (!trades.length) {
+            body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:22px 14px">' +
+              'Belum ada trade selesai — total P/L virtual <b class="mono">$0,00</b>, win rate belum bisa dihitung.</td></tr>';
+            return;
+          }
+          body.innerHTML = trades.map(function (t) {
+            var pnl = tradePnl(t);
+            var isLong = t.side === 'long';
+            return '<tr>' +
+              '<td data-label="Koin"><b>' + esc(t.coin) + '</b></td>' +
+              '<td data-label="Arah"><span class="side ' + (isLong ? 'side-long' : 'side-short') + '">' + (isLong ? 'LONG' : 'SHORT') + '</span></td>' +
+              '<td data-label="Dibuka">' + openWib(t.openedAt) + '</td>' +
+              '<td data-label="Ditutup">' + openWib(t.closedAt || t.exitAt) + '</td>' +
+              '<td data-label="Entry" class="num mono">' + fmtPriceID(t.entry) + '</td>' +
+              '<td data-label="Exit" class="num mono">' + fmtPriceID(t.exit !== null && t.exit !== undefined ? t.exit : t.exitPrice) + '</td>' +
+              '<td data-label="Alasan keluar">' + esc(t.exitReason || t.reason || '—') + '</td>' +
+              '<td data-label="P/L Virtual" class="num mono ' + (pnl > 0 ? 'pos' : (pnl < 0 ? 'neg' : 'neu')) + '">' + fmtUsdID(pnl) + '</td></tr>';
+          }).join('');
+        }
+
+        function loadPrices() {
+          if (priceBusy || !lastData || typeof fetchM1 !== 'function') return;
+          var positions = lastData.positions || [];
+          if (!positions.length) return;
+          priceBusy = true;
+          var jobs = positions.map(function (pos) {
+            var c = coinObj(pos.coin);
+            if (!c) return Promise.resolve();
+            return fetchM1(c).then(function (r) {
+              var closes = r.m1.map(function (k) { return k.c; });
+              prices[pos.coin] = { price: closes[closes.length - 1], source: r.source, live: true };
+            }).catch(function () { /* harga terakhir yang tercatat dipertahankan */ });
+          });
+          Promise.all(jobs).then(function () { priceBusy = false; render(); });
+        }
+
+        function loadPositions() {
+          var fetchFn = typeof fetchJson === 'function'
+            ? function (u) { return fetchJson(u, 9000); }
+            : function (u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); };
+          return fetchFn(POS_URL + '?t=' + Date.now()).then(function (d) {
+            if (!d || !Array.isArray(d.positions)) throw new Error('format file tidak dikenal');
+            lastData = d;
+            setStatus('ok', 'POSISI LIVE');
+            metaEl.textContent = 'Terakhir diperbarui (mesin): ' + (d.updatedAtWib || '—') + ' WIB · harga sekarang & P/L mengambang dihitung live di browser';
+            render();
+            renderTrades();
+            loadPrices();
+          }).catch(function () {
+            setStatus('err', 'GAGAL MEMPERBARUI');
+            metaEl.textContent = lastData
+              ? 'File posisi gagal dimuat — menampilkan data terakhir yang berhasil dimuat (mesin: ' + (lastData.updatedAtWib || '—') + ' WIB). Mencoba lagi otomatis tiap 60 detik.'
+              : 'File posisi mesin demo belum bisa dimuat. Mencoba lagi otomatis tiap 60 detik.';
+            render();
+          });
+        }
+
+        // ===== Tutup manual: konfirmasi + salin perintah chat =====
+        // Halaman ini statis — tombol TIDAK menutup posisi di browser. Ia hanya
+        // menyalin perintah `tutup <KOIN>`; mesin demo yang mengeksekusi pada run
+        // berikutnya (cron 15 menit) dengan alasan MANUAL-CLOSE.
+        function estClose(pos, price) {
+          // Perkiraan seperti mesin: P/L kotor dikurangi fee 0,06% + slippage 0,02%
+          // dari nilai posisi (qty × harga tutup).
+          var gross = plOf(pos, price);
+          var cost = pos.qty * price * 0.0008;
+          return { gross: gross, cost: cost, net: gross - cost };
+        }
+        function plCls(v) { return v > 0 ? 'pos' : (v < 0 ? 'neg' : 'neu'); }
+        function rowHtml(k, v) {
+          return '<div class="pos-row"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>';
+        }
+        function openCloseModal(target) {
+          if (!modalEl || !lastData) return;
+          closeTarget = target;
+          var positions = lastData.positions || [];
+          var html = '';
+          if (target === 'ALL') {
+            modalTitle.textContent = 'Tutup Semua Posisi Terbuka';
+            var totNet = 0, totOk = true;
+            positions.forEach(function (pos) {
+              var pr = prices[pos.coin];
+              var price = pr ? pr.price : null;
+              if (price === null || price === undefined) { totOk = false; return; }
+              var est = estClose(pos, price);
+              totNet += est.net;
+              html += rowHtml(esc(pos.coin) + ' ' + (pos.side === 'long' ? 'LONG' : 'SHORT'),
+                '<span class="mono">' + fmtPriceID(pos.entry) + ' → ' + fmtPriceID(price) + '</span><br>' +
+                '<span class="mono ' + plCls(est.net) + '">' + fmtUsdID(est.net) + '</span> <small>estimasi bersih</small>');
+            });
+            html += rowHtml('Total Estimasi P/L Dikunci',
+              '<span class="mono ' + (totOk ? plCls(totNet) : 'neu') + '">' + (totOk ? fmtUsdID(totNet) : 'menunggu harga live…') + '</span>');
+          } else {
+            var pos = null;
+            positions.forEach(function (p) { if (p.coin === target) pos = p; });
+            if (!pos) return;
+            var pr2 = prices[pos.coin];
+            var price2 = pr2 ? pr2.price : null;
+            var isLong2 = pos.side === 'long';
+            modalTitle.textContent = 'Tutup Posisi ' + pos.coin + ' — ' + (isLong2 ? 'LONG' : 'SHORT');
+            html += rowHtml('Koin', '<b>' + esc(pos.coin) + '</b> <span class="side ' + (isLong2 ? 'side-long' : 'side-short') + '">' + (isLong2 ? 'LONG' : 'SHORT') + '</span>');
+            html += rowHtml('Entry', '<span class="mono">' + fmtPriceID(pos.entry) + '</span>');
+            if (price2 === null || price2 === undefined) {
+              html += rowHtml('Harga Live Saat Ini', '<span class="mono">—</span> <small>menunggu data live…</small>');
+              html += rowHtml('Estimasi P/L Dikunci', '<span class="mono neu">belum bisa dihitung</span>');
+            } else {
+              var est2 = estClose(pos, price2);
+              html += rowHtml('Harga Live Saat Ini', '<span class="mono">' + fmtPriceID(price2) + '</span> <small>' + (pr2.live ? 'live' : 'terakhir tercatat') + ' · ' + esc(pr2.source) + '</small>');
+              html += rowHtml('Jumlah', '<span class="mono">' + fmtQtyID(pos.qty) + ' ' + esc(pos.coin) + '</span>');
+              html += rowHtml('P/L Mengambang (kotor)', '<span class="mono ' + plCls(est2.gross) + '">' + fmtUsdID(est2.gross) + '</span>');
+              html += rowHtml('Biaya Tutup (fee 0,06% + slippage 0,02%)', '<span class="mono neg">−' + fmtUsdPlain(est2.cost).replace('−', '') + '</span>');
+              html += rowHtml('Estimasi P/L Dikunci', '<span class="mono ' + plCls(est2.net) + '" style="font-size:15px">' + fmtUsdID(est2.net) + '</span>');
+            }
+          }
+          modalRows.innerHTML = html;
+          confirmView.hidden = false;
+          doneView.hidden = true;
+          backdropEl.hidden = false;
+          modalEl.hidden = false;
+        }
+        function hideCloseModal() {
+          if (!modalEl) return;
+          modalEl.hidden = true;
+          if (backdropEl) backdropEl.hidden = true;
+          closeTarget = null;
+        }
+        function legacyCopy(txt) {
+          try {
+            var ta = document.createElement('textarea');
+            ta.value = txt;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            var ok = false;
+            try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+            document.body.removeChild(ta);
+            return ok;
+          } catch (e) { return false; }
+        }
+        function copyCommand(txt) {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(txt).then(function () { return true; }, function () { return legacyCopy(txt); });
+          }
+          return Promise.resolve(legacyCopy(txt));
+        }
+        function confirmClose() {
+          if (closeTarget === null) return;
+          var cmd, coins;
+          if (closeTarget === 'ALL') {
+            cmd = 'tutup semua';
+            coins = (lastData.positions || []).map(function (p) { return p.coin; });
+          } else {
+            cmd = 'tutup ' + closeTarget;
+            coins = [closeTarget];
+          }
+          copyCommand(cmd).then(function (copied) {
+            coins.forEach(function (c) { closeRequested[c] = true; });
+            cmdText.textContent = cmd;
+            doneText.textContent = copied
+              ? (closeTarget === 'ALL'
+                  ? 'Perintah disalin — tempel di chat Rias, mesin akan menutup semua posisi terbuka dengan alasan MANUAL-CLOSE.'
+                  : 'Perintah disalin — tempel di chat Rias, mesin akan menutup posisi ini dengan alasan MANUAL-CLOSE.')
+              : 'Perintah belum tersalin otomatis — salin teks perintah di bawah ini, lalu tempel di chat Rias. Mesin akan menutup posisi ini dengan alasan MANUAL-CLOSE.';
+            confirmView.hidden = true;
+            doneView.hidden = false;
+            render();
+          });
+        }
+        var sectionEl = document.getElementById('posisi-terbuka');
+        if (sectionEl) {
+          sectionEl.addEventListener('click', function (ev) {
+            var t = ev.target;
+            if (!t || !t.closest) return;
+            var coinBtn = t.closest('[data-close-coin]');
+            if (coinBtn) { openCloseModal(coinBtn.getAttribute('data-close-coin')); return; }
+            if (t.closest('[data-close-all]')) openCloseModal('ALL');
+          });
+        }
+        var cancelBtn = document.getElementById('closeCancelBtn');
+        if (cancelBtn) cancelBtn.addEventListener('click', hideCloseModal);
+        var confirmBtn = document.getElementById('closeConfirmBtn');
+        if (confirmBtn) confirmBtn.addEventListener('click', confirmClose);
+        var doneBtn = document.getElementById('closeDoneBtn');
+        if (doneBtn) doneBtn.addEventListener('click', hideCloseModal);
+        if (backdropEl) backdropEl.addEventListener('click', hideCloseModal);
+        document.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape' && modalEl && !modalEl.hidden) hideCloseModal();
+        });
+
+        render();
+        renderTrades();
+        loadPositions();
+        setInterval(loadPositions, 60000);
+        setInterval(loadPrices, 60000);
+      })();
+    </script>
+  </body>
+</html>
