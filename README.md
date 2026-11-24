@@ -33,6 +33,25 @@ dashboard menutup posisi secara instan lewat server action fullstack; alur lama
 lewat perintah chat `tutup <KOIN>` tetap ada sebagai cadangan (lihat `STRATEGY.md`
 bagian "Tutup manual").
 
+## Versi live GitHub Pages (`index.html` + `state.json`)
+
+`index.html` adalah dashboard **statis tapi live**: harga + Bias 18 koin dihitung
+di browser dari API publik Binance Spot (fallback Binance US → OKX → Gate.io,
+tanpa kunci API), auto-refresh 60 detik, lengkap dengan checklist 4 syarat entry
+(Bias / EMA cross / EMA50 / RSI 1 jam). Saldo, posisi terbuka (dengan USDT
+dipasang), dan riwayat trade dibaca dari `state.json` di repo ini, yang
+disinkronkan dari mesin demo tiap ~15 menit (cron `demo-trading-18-state-sync-15m`).
+
+**Tombol "Tutup Sekarang" ADA di versi Pages** — di tiap kartu posisi (dan
+"Tutup Semua" bila >1 posisi). Karena Pages tidak punya server, klik tombol
+membuka modal konfirmasi (harga live + estimasi P/L) dengan perintah yang bisa
+disalin: `node close-request.cjs <KOIN>` lalu `node engine.cjs`. Posisi
+tertutup setelah perintah itu dijalankan di PC (folder hasil `git clone`).
+Tombol ini TIDAK menutup langsung dari halaman Pages.
+
+Aktifkan GitHub Pages di repo Settings > Pages (deploy from branch `main`, folder `/ (root)`),
+lalu buka https://danryu655-ship-it.github.io/demo-trading-18/
+
 ## Data
 
 Binance public (`data-api.binance.vision`, tanpa key) → fallback Binance US → OKX → Gate.io.

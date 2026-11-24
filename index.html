@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo Trading 18 — Live (Paper)</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1220;color:#e5e7eb;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:6px 0 2px}
+h2{font-size:17px;margin:26px 0 8px;border-bottom:1px solid #263248;padding-bottom:6px}
+.sub{color:#9ca3af;font-size:13px;line-height:1.5}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.04em;margin:2px 4px 2px 0}
+.paper{background:#7c2d12;color:#fed7aa}.live{background:#065f46;color:#a7f3d0}.err{background:#7f1d1d;color:#fecaca}.standby{background:#334155;color:#e2e8f0}.warn{background:#713f12;color:#fde68a}
+.card{background:#111c33;border:1px solid #263248;border-radius:12px;padding:14px;margin:10px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.metric .k{font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em}
+.metric .v{font-size:20px;font-weight:700;margin-top:2px}
+.metric .d{font-size:12px;color:#9ca3af}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 6px;border-bottom:1px solid #1f2a44;text-align:left;vertical-align:top}
+th{color:#9ca3af;font-size:11px;text-transform:uppercase}
+tr.sel{background:#16263f}
+button{cursor:pointer;background:#2563eb;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:600}
+button.ghost{background:#1e293b;color:#e5e7eb}
+button.danger{background:#b91c1c}
+button:disabled{opacity:.45;cursor:not-allowed}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+.ok{background:#22c55e}.no{background:#ef4444}.na{background:#64748b}
+.pos{color:#4ade80}.neg{color:#f87171}
+select{background:#0f1a2e;color:#e5e7eb;border:1px solid #334155;border-radius:8px;padding:8px}
+code{background:#0f1a2e;border:1px solid #334155;border-radius:6px;padding:2px 6px;font-size:12px}
+pre{background:#0f1a2e;border:1px solid #334155;border-radius:8px;padding:10px;overflow:auto;font-size:12px;line-height:1.6}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal-bg.open{display:flex}
+.modal{background:#111c33;border:1px solid #334155;border-radius:14px;max-width:520px;width:100%;padding:18px;max-height:90vh;overflow:auto}
+.row{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed #263248;font-size:13px}
+.row b{text-align:right}
+.small{font-size:12px;color:#9ca3af;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Demo Trading 18 — Live <span class="badge paper">PAPER</span><span class="badge paper">DEMO</span><span class="badge paper">VIRTUAL</span> <span class="badge standby lvb">MENUNGGU DATA</span></h1>
+<p class="sub">Saldo virtual $1.000, 18 koin, LONG + SHORT. Harga dan Bias dihitung <b>live di browser</b> dari API publik Binance Spot (tanpa kunci API) dengan fallback Binance US → OKX → Gate.io, diperbarui tiap 60 detik. Posisi, saldo, dan riwayat trade dibaca dari <code>state.json</code> di repo ini (diperbarui tiap ~15 menit oleh mesin demo). <b>Ini tampilan live — bukan dashboard fullstack di aplikasi Muse.</b></p>
+<p class="sub">Terakhir diperbarui: <b id="clock">—</b> &nbsp;·&nbsp; Perbarui dalam <b id="countdown">60</b> dtk &nbsp; <button class="ghost" onclick="refreshAll()">Perbarui sekarang</button> <button class="ghost" onclick="loadState(true)">Sinkronkan state.json</button></p>
+
+<h2>01 · Ringkasan Saldo (dari state.json)</h2>
+<div class="card"><div class="grid">
+<div class="metric"><div class="k">Saldo Virtual</div><div class="v" id="bal">$—</div><div class="d" id="balD">—</div></div>
+<div class="metric"><div class="k">P/L Terealisasi Hari Ini</div><div class="v" id="dayPnl">$—</div><div class="d" id="dayDate">—</div></div>
+<div class="metric"><div class="k">Posisi Terbuka</div><div class="v" id="posN">—</div><div class="d" id="posD">—</div></div>
+<div class="metric"><div class="k">Trade Ditutup</div><div class="v" id="trN">—</div><div class="d" id="trD">—</div></div>
+</div>
+<p class="small" id="syncInfo">state.json belum dimuat.</p></div>
+
+<h2>02 · Posisi Terbuka</h2>
+<div id="positions"><div class="card"><p class="sub">Memuat posisi dari state.json…</p></div></div>
+
+<h2>03 · Bias Momentum Live + 4 Syarat Entry (18 koin)</h2>
+<p class="sub">Skor Bias Momentum 0–100 dihitung dari RSI, EMA, dan momentum harga spot — <b>bukan</b> data Long/Short futures asli. LONG layak bila 4 syarat terpenuhi: Bias &gt; 55, EMA9 cross UP di atas EMA21, close &gt; EMA50, RSI 1 jam ≤ 70. SHORT layak bila: Bias &lt; 45, EMA9 cross DOWN, close &lt; EMA50, RSI 1 jam ≥ 30. Checklist dihitung di browser dari candle 1 jam tertutup terakhir; bisa sedikit berbeda dari perhitungan mesin (lastRun).</p>
+<div class="card" style="overflow:auto"><table>
+<thead><tr><th>Koin</th><th>Harga Live</th><th>Bias</th><th>RSI 1j</th><th>EMA9 / 21 / 50 (1j)</th><th>Gate LONG</th><th>Gate SHORT</th><th>Keputusan</th></tr></thead>
+<tbody id="liveBody"><tr><td colspan="8">Memuat data live…</td></tr></tbody>
+</table></div>
+<p class="small" id="liveSrc">Sumber: —</p>
+
+<h2>04 · Detail Koin</h2>
+<div class="card">
+<select id="coinSel" onchange="selectCoin(this.value)"></select>
+<div class="grid" style="margin-top:10px">
+<div class="metric"><div class="k">Harga</div><div class="v" id="mPrice">—</div><div class="d" id="mSrc">—</div></div>
+<div class="metric"><div class="k">Bias Momentum</div><div class="v" id="mBias">—</div><div class="d">0–100, dari spot</div></div>
+<div class="metric"><div class="k">RSI 14 (1 mnt)</div><div class="v" id="mRsi">—</div><div class="d">RSI 1 jam: <span id="mRsi1h">—</span></div></div>
+<div class="metric"><div class="k">EMA20 / EMA50 (1 mnt)</div><div class="v" id="mEma" style="font-size:15px">—</div><div class="d">ATR 14: <span id="mAtr">—</span></div></div>
+<div class="metric"><div class="k">Perubahan 1 jam</div><div class="v" id="mChg">—</div><div class="d">Volatilitas 1j: <span id="mVol">—</span></div></div>
+<div class="metric"><div class="k">Support / Resistance 1j</div><div class="v" id="mSR" style="font-size:15px">—</div><div class="d">6j: <span id="mSR6">—</span></div></div>
+</div></div>
+
+<h2>05 · Riwayat Trade &amp; P/L</h2>
+<div id="trades"><div class="card"><p class="sub">Memuat riwayat dari state.json…</p></div></div>
+
+<h2>06 · Aturan Strategi (LONG + SHORT)</h2>
+<div class="card"><p class="sub">Candle 1 jam · EMA9 cross EMA21 + filter EMA50 + Bias Momentum + RSI14 · SL 1,5× ATR(14) · TP 2R · Risiko 0,4% per trade · Maks 3 posisi · Batas rugi harian $20 (kill switch). Fee simulasi 0,06% + slippage 0,02% per sisi. <b>SHORT di demo ini hanya simulasi — di trading real, short TIDAK bisa di Spot, harus lewat Futures/margin dengan risiko likuidasi.</b></p>
+<p class="sub">Backtest 7 hari (17–24 Nov 2026), jujur: <b>KALAH</b> — long-only 20 trade, profit factor 0,61, saldo $976,85 (−2,32%); long+short 30 trade, profit factor 0,77, saldo $980,79 (−1,92%). Kriteria lulus: profit factor &gt; 1 setelah 30 trade. Strategi ini <b>belum lulus — jangan pakai uang asli</b>.</p></div>
+
+<h2>07 · Cara Menutup Posisi dari PC</h2>
+<div class="card"><p class="sub">Versi GitHub Pages ini <b>tidak bisa menutup posisi secara instan</b> — tidak ada server di belakangnya. Tombol “Tutup Sekarang” di kartu posisi membuka konfirmasi berisi harga live + estimasi P/L dan perintah yang bisa disalin. Penutupan terjadi setelah kamu menjalankan perintah itu di PC (di folder hasil <code>git clone</code>):</p>
+<pre>node close-request.cjs &lt;KOIN&gt;   # contoh: node close-request.cjs SOMI
+node engine.cjs                  # mesin menutup di harga live, alasan MANUAL-CLOSE</pre>
+<p class="sub">Untuk tutup semua posisi: <code>node close-request.cjs ALL</code> lalu <code>node engine.cjs</code>. Atau bilang <code>tutup &lt;KOIN&gt;</code> di chat ke Rias.</p></div>
+
+<footer class="small">Demo Trading 18 — PAPER / DEMO / VIRTUAL. Bukan saran finansial, bukan bot trading uang asli. Harga live dari API publik Binance Spot / Binance US / OKX / Gate.io; posisi &amp; saldo dari state.json repo ini (sinkron ~15 menit).</footer>
+</div>
+
+<div class="modal-bg" id="modalBg"><div class="modal">
+<h2 style="margin-top:0" id="modalTitle">Tutup Posisi</h2>
+<div id="modalBody"></div>
+<p class="small"><b>Penting:</b> halaman ini (GitHub Pages) <b>tidak bisa menutup posisi langsung</b> — tidak ada server. Salin perintah di bawah dan jalankan di PC (folder hasil git clone), maka posisi tertutup di harga live saat mesin jalan.</p>
+<pre id="modalCmd"></pre>
+<p><button onclick="copyCmd()">Salin Perintah</button> <button class="ghost" onclick="closeModal()">Batal</button></p>
+<p class="small" id="copyNote"></p>
+</div></div>
+
+<script>
+"use strict";
+
+/* ---- live pipeline from Market Move (verbatim) ---- */
+var COINS = [
+  {s:"BTC", name:"Bitcoin"}, {s:"ETH", name:"Ethereum"}, {s:"BNB", name:"BNB"},
+  {s:"ENA", name:"Ethena"}, {s:"ONDO", name:"Ondo"}, {s:"XAU", name:"Emas (PAXG)", binance:"PAXGUSDT", okx:"PAXG", gate:"PAXG"},
+  {s:"SHIB", name:"Shiba Inu"}, {s:"PENGU", name:"Pudgy Penguins"}, {s:"SUI", name:"Sui"},
+  {s:"XPL", name:"Plasma", noUS:true}, {s:"PUMP", name:"Pump.fun"}, {s:"PYTH", name:"Pyth Network", noUS:true},
+  {s:"ZEC", name:"Zcash"}, {s:"ASTER", name:"Aster"}, {s:"JUP", name:"Jupiter"},
+  {s:"HYPE", name:"Hyperliquid"}, {s:"WCT", name:"WalletConnect", noUS:true}, {s:"SOMI", name:"Somnia", noUS:true, noOKX:true}
+];
+function coinDef(sym){
+  for (var i=0;i<COINS.length;i++) if (COINS[i].s===sym) return COINS[i];
+  return {s:sym, name:sym};
+}
+function binSym(c){ return c.binance || (c.s+"USDT"); }
+function okxBase(c){ return c.okx || c.s; }
+function gateBase(c){ return c.gate || c.s; }
+
+var state = { selected:"BTC", cache:{}, stripData:{}, lastOk:null, timer:60, loading:false, anySuccess:false, attempted:false };
+function updateBadges(){
+  var txt = state.anySuccess ? "DATA LIVE" : (state.attempted ? "GAGAL DIMUAT" : "MENUNGGU DATA");
+  var cls = state.anySuccess ? "badge live lvb" : (state.attempted ? "badge err lvb" : "badge standby lvb");
+  var els=document.querySelectorAll(".lvb");
+  for (var i=0;i<els.length;i++){ els[i].textContent=txt; els[i].className=cls; }
+}
+
+/* ================= HELPERS ================= */
+function $(id){ return document.getElementById(id); }
+function fmt(n){
+  if (n===null||n===undefined||isNaN(n)) return "—";
+  var a=Math.abs(n), d;
+  if (a>=1000) d=1; else if (a>=100) d=2; else if (a>=1) d=3; else if (a>=0.01) d=5; else if (a>=0.0001) d=7; else d=9;
+  return n.toLocaleString("en-US",{minimumFractionDigits:d, maximumFractionDigits:d});
+}
+function fmtQty(n){
+  if (n===null||n===undefined||isNaN(n)) return "—";
+  if (n>=1e9) return (n/1e9).toFixed(2)+"B";
+  if (n>=1e6) return (n/1e6).toFixed(2)+"M";
+  if (n>=1e3) return (n/1e3).toFixed(2)+"K";
+  return n.toFixed(2);
+}
+function wibTime(d){
+  try{ return d.toLocaleString("id-ID",{timeZone:"Asia/Jakarta",hour:"2-digit",minute:"2-digit",second:"2-digit",day:"2-digit",month:"short"})+" WIB"; }
+  catch(e){ return d.toLocaleString("id-ID")+" WIB"; }
+}
+function wibHM(ts){
+  try{ return new Date(ts).toLocaleTimeString("id-ID",{timeZone:"Asia/Jakarta",hour:"2-digit",minute:"2-digit"}); }
+  catch(e){ return new Date(ts).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}); }
+}
+function fetchJSON(url, timeoutMs){
+  return new Promise(function(resolve,reject){
+    var ctl = ("AbortController" in window) ? new AbortController() : null;
+    var to = setTimeout(function(){ if(ctl) ctl.abort(); reject(new Error("timeout")); }, timeoutMs||12000);
+    fetch(url, ctl?{signal:ctl.signal}:undefined).then(function(r){
+      clearTimeout(to);
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return r.json();
+    }).then(resolve).catch(function(e){ clearTimeout(to); reject(e); });
+  });
+}
+
+/* ================= DATA LAYER (fallback chain) ================= */
+/* Normalized candle: {t,o,h,l,c,v} oldest first */
+function parseBinance(arr){
+  return arr.map(function(k){ return {t:k[0], o:+k[1], h:+k[2], l:+k[3], c:+k[4], v:+k[5]}; });
+}
+function parseOKX(arr){ /* newest first -> reverse */
+  return arr.slice().reverse().map(function(k){ return {t:+k[0], o:+k[1], h:+k[2], l:+k[3], c:+k[4], v:+k[5]}; });
+}
+function parseGate(arr){ /* [tsSec, vol, close, high, low, open] oldest first */
+  return arr.map(function(k){ return {t:+k[0]*1000, v:+k[1], c:+k[2], h:+k[3], l:+k[4], o:+k[5]}; });
+}
+var SOURCES = [
+  { id:"binance", label:"Binance Spot",
+    ok:function(c){ return true; },
+    m1:function(c){ return fetchJSON("https://data-api.binance.vision/api/v3/klines?symbol="+binSym(c)+"&interval=1m&limit=300").then(parseBinance); },
+    h1:function(c){ return fetchJSON("https://data-api.binance.vision/api/v3/klines?symbol="+binSym(c)+"&interval=1h&limit=120").then(parseBinance); },
+    depth:function(c){ return fetchJSON("https://data-api.binance.vision/api/v3/depth?symbol="+binSym(c)+"&limit=10"); } },
+  { id:"binanceus", label:"Binance US",
+    ok:function(c){ return !c.noUS; },
+    m1:function(c){ return fetchJSON("https://api.binance.us/api/v3/klines?symbol="+binSym(c)+"&interval=1m&limit=300").then(parseBinance); },
+    h1:function(c){ return fetchJSON("https://api.binance.us/api/v3/klines?symbol="+binSym(c)+"&interval=1h&limit=120").then(parseBinance); },
+    depth:function(c){ return fetchJSON("https://api.binance.us/api/v3/depth?symbol="+binSym(c)+"&limit=10"); } },
+  { id:"okx", label:"OKX",
+    ok:function(c){ return !c.noOKX; },
+    m1:function(c){ return fetchJSON("https://www.okx.com/api/v5/market/candles?instId="+okxBase(c)+"-USDT&bar=1m&limit=300").then(function(j){ if(j.code!=="0"||!j.data||!j.data.length) throw new Error("OKX kosong"); return parseOKX(j.data); }); },
+    h1:function(c){ return fetchJSON("https://www.okx.com/api/v5/market/candles?instId="+okxBase(c)+"-USDT&bar=1H&limit=120").then(function(j){ if(j.code!=="0"||!j.data||!j.data.length) throw new Error("OKX kosong"); return parseOKX(j.data); }); },
+    depth:null },
+  { id:"gate", label:"Gate.io",
+    ok:function(c){ return true; },
+    m1:function(c){ return fetchJSON("https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair="+gateBase(c)+"_USDT&interval=1m&limit=300").then(parseGate); },
+    h1:function(c){ return fetchJSON("https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair="+gateBase(c)+"_USDT&interval=1h&limit=120").then(parseGate); },
+    depth:null }
+];
+function fetchCandles(c){
+  /* try sources in order; returns {m1,h1,source} — h1 best-effort */
+  var idx=0;
+  function attempt(){
+    if (idx>=SOURCES.length) return Promise.reject(new Error("Semua sumber gagal"));
+    var src=SOURCES[idx++];
+    if (!src.ok(c)) return attempt();
+    return src.m1(c).then(function(m1){
+      if(!m1||m1.length<60) throw new Error("data kurang");
+      return src.h1(c).then(function(h1){ return {m1:m1,h1:h1,source:src.label}; })
+        .catch(function(){ return {m1:m1,h1:null,source:src.label}; });
+    }).catch(function(){ return attempt(); });
+  }
+  return attempt();
+}
+function fetchDepth(c){
+  return SOURCES[0].depth(c).then(function(d){ return {d:d, source:"Binance Spot"}; })
+    .catch(function(){ return SOURCES[1].depth(c).then(function(d){ return {d:d, source:"Binance US"}; }); });
+}
+
+/* ================= INDICATORS ================= */
+function emaSeries(vals, p){
+  var k=2/(p+1), out=[], e=null;
+  for (var i=0;i<vals.length;i++){ e = (e===null)? vals[i] : vals[i]*k + e*(1-k); out.push(e); }
+  return out;
+}
+function rsiWilder(closes, p){
+  p=p||14;
+  if (closes.length<=p) return null;
+  var g=0,l=0,i;
+  for (i=1;i<=p;i++){ var d=closes[i]-closes[i-1]; if(d>0)g+=d; else l-=d; }
+  g/=p; l/=p;
+  for (i=p+1;i<closes.length;i++){ var dd=closes[i]-closes[i-1]; g=(g*(p-1)+(dd>0?dd:0))/p; l=(l*(p-1)+(dd<0?-dd:0))/p; }
+  if (l===0) return 100;
+  return 100 - 100/(1+g/l);
+}
+function atrWilder(cs, p){
+  p=p||14;
+  if (cs.length<=p) return null;
+  var trs=[], i;
+  for (i=1;i<cs.length;i++){
+    var h=cs[i].h, lo=cs[i].l, pc=cs[i-1].c;
+    trs.push(Math.max(h-lo, Math.abs(h-pc), Math.abs(lo-pc)));
+  }
+  var a=0; for (i=0;i<p;i++) a+=trs[i]; a/=p;
+  for (i=p;i<trs.length;i++) a=(a*(p-1)+trs[i])/p;
+  return a;
+}
+function biasScore(m){
+  /* 0..100 from RSI, EMA trend, 1h momentum */
+  var score=50;
+  if (m.rsi!==null) score += (m.rsi-50)*0.55;
+  if (m.ema20!==null && m.ema50!==null && m.ema50!==0) score += Math.max(-14, Math.min(14, (m.ema20-m.ema50)/m.ema50*2200));
+  if (m.price && m.ema20) score += (m.price>m.ema20)? 6 : -6;
+  score += Math.max(-12, Math.min(12, m.chg1h*1.6));
+  return Math.max(2, Math.min(98, Math.round(score)));
+}
+function computeMetrics(m1, h1){
+  var closes=m1.map(function(x){return x.c;});
+  var price=closes[closes.length-1];
+  var e20=emaSeries(closes,20), e50=emaSeries(closes,50);
+  var last60=m1.slice(-60);
+  var s1=Math.min.apply(null,last60.map(function(x){return x.l;}));
+  var r1=Math.max.apply(null,last60.map(function(x){return x.h;}));
+  var s6,r6;
+  if (h1 && h1.length>=6){ var l6=h1.slice(-6); s6=Math.min.apply(null,l6.map(function(x){return x.l;})); r6=Math.max.apply(null,l6.map(function(x){return x.h;})); }
+  else { var l360=m1.slice(-360); s6=Math.min.apply(null,l360.map(function(x){return x.l;})); r6=Math.max.apply(null,l360.map(function(x){return x.h;})); }
+  var atr=atrWilder(m1,14);
+  /* volatility 1h: stdev of 1m returns over last 60, in % */
+  var rets=[]; for (var i=m1.length-60;i<m1.length;i++){ if(i>0) rets.push((closes[i]-closes[i-1])/closes[i-1]*100); }
+  var mean=rets.reduce(function(a,b){return a+b;},0)/rets.length;
+  var vol=Math.sqrt(rets.reduce(function(a,b){return a+(b-mean)*(b-mean);},0)/rets.length);
+  var open1h = m1.length>60 ? m1[m1.length-61].c : m1[0].c;
+  var chg1h=(price-open1h)/open1h*100;
+  var volQ=last60.reduce(function(a,x){return a+x.v*x.c;},0);
+  var fcRange = atr!==null ? atr*Math.sqrt(60)*0.9 : price*0.01;
+  var m={ price:price, rsi:rsiWilder(closes,14), ema20:e20[e20.length-1], ema50:e50[e50.length-1],
+    atr:atr, vol1h:vol, chg1h:chg1h, volQuote:volQ, s1:s1, r1:r1, s6:s6, r6:r6,
+    fcHigh:price+fcRange, fcLow:price-fcRange,
+    fsIdx:Math.max(0,m1.length-61), fsPrice: m1.length>60? m1[m1.length-61].c : m1[0].c };
+  m.bias=biasScore(m);
+  return m;
+}
+/* ---- demo desk logic (state.json + gates + close modal) ---- */
+var liveData = {};   // sym -> {m, g, source} or {error}
+var deskState = null;
+var selected = "BTC";
+var timerLeft = 60;
+
+function fmtMoney(n){
+  if (n===null||n===undefined||isNaN(n)) return "—";
+  var sign = n<0 ? "-" : "";
+  var a = Math.abs(n);
+  return sign + "$" + a.toLocaleString("en-US",{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtPrice(n){
+  if (n===null||n===undefined||isNaN(n)) return "—";
+  var a=Math.abs(n), d;
+  if (a>=1000) d=2; else if (a>=100) d=2; else if (a>=1) d=4; else if (a>=0.01) d=5; else if (a>=0.0001) d=7; else d=9;
+  return "$" + n.toLocaleString("en-US",{minimumFractionDigits:d, maximumFractionDigits:d});
+}
+function fmtPct(n){ return (n===null||n===undefined||isNaN(n)) ? "—" : (n>0?"+":"") + n.toFixed(2) + "%"; }
+function wibFull(iso){
+  try{ return new Date(iso).toLocaleString("id-ID",{timeZone:"Asia/Jakarta",day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"})+" WIB"; }
+  catch(e){ return iso; }
+}
+function gateDot(ok){ return '<span class="dot '+(ok===true?"ok":ok===false?"no":"na")+'"></span>'; }
+
+function computeGates(h1){
+  /* closed 1h candles only (drop the forming last candle) */
+  if (!h1 || h1.length < 60) return null;
+  var closed = h1.slice(0, -1);
+  var closes = closed.map(function(x){ return x.c; });
+  var e9 = emaSeries(closes, 9), e21 = emaSeries(closes, 21), e50 = emaSeries(closes, 50);
+  var n = closes.length - 1;
+  var rsi1h = rsiWilder(closes, 14);
+  var crossUp = e9[n-1] <= e21[n-1] && e9[n] > e21[n];
+  var crossDown = e9[n-1] >= e21[n-1] && e9[n] < e21[n];
+  return { ema9:e9[n], ema21:e21[n], ema50:e50[n], rsi1h:rsi1h,
+    crossUp:crossUp, crossDown:crossDown, close:closes[n] };
+}
+
+function loadCoin(c){
+  return fetchCandles(c).then(function(res){
+    var m = computeMetrics(res.m1, res.h1);
+    var g = computeGates(res.h1);
+    liveData[c.s] = { m:m, g:g, source:res.source };
+    return true;
+  }).catch(function(e){
+    liveData[c.s] = { error:String(e && e.message || e) };
+    return false;
+  });
+}
+
+function renderLive(){
+  var rows = "";
+  COINS.forEach(function(c){
+    var d = liveData[c.s];
+    if (!d){ rows += "<tr><td>"+c.s+"</td><td colspan='7'>—</td></tr>"; return; }
+    if (d.error){ rows += "<tr><td>"+c.s+"</td><td colspan='7' class='neg'>GAGAL DIMUAT ("+d.error+")</td></tr>"; return; }
+    var m = d.m, g = d.g;
+    var longGates = g ? [
+      {label:"Bias>55", ok:m.bias>55, val:m.bias},
+      {label:"Cross UP", ok:g.crossUp, val:g.crossUp?"YA":"tidak"},
+      {label:"Close>EMA50", ok:g.close>g.ema50, val:fmtPrice(g.close)+" vs "+fmtPrice(g.ema50)},
+      {label:"RSI<=70", ok:g.rsi1h!==null && g.rsi1h<=70, val:g.rsi1h===null?"—":g.rsi1h.toFixed(1)}
+    ] : null;
+    var shortGates = g ? [
+      {label:"Bias<45", ok:m.bias<45, val:m.bias},
+      {label:"Cross DOWN", ok:g.crossDown, val:g.crossDown?"YA":"tidak"},
+      {label:"Close<EMA50", ok:g.close<g.ema50, val:fmtPrice(g.close)+" vs "+fmtPrice(g.ema50)},
+      {label:"RSI>=30", ok:g.rsi1h!==null && g.rsi1h>=30, val:g.rsi1h===null?"—":g.rsi1h.toFixed(1)}
+    ] : null;
+    function gateHtml(list){
+      if (!list) return "—";
+      return list.map(function(x){ return "<div>"+gateDot(x.ok)+x.label+" ("+x.val+")</div>"; }).join("");
+    }
+    var longOk = longGates && longGates.every(function(x){ return x.ok; });
+    var shortOk = shortGates && shortGates.every(function(x){ return x.ok; });
+    var verdict = longOk ? '<span class="pos"><b>LAYAK LONG</b></span>' : shortOk ? '<span class="pos"><b>LAYAK SHORT</b></span>' : '<span class="small">Belum layak</span>';
+    rows += "<tr"+(c.s===selected?" class='sel'":"")+"><td><a href='#' style='color:#93c5fd' onclick='selectCoin(\""+c.s+"\");return false;'><b>"+c.s+"</b></a><br><span class='small'>"+c.name+"</span></td>"
+      + "<td>"+fmtPrice(m.price)+"<br><span class='small'>"+fmtPct(m.chg1h)+" /1j</span></td>"
+      + "<td><b>"+m.bias+"</b><br><span class='small'>"+(m.bias>55?"condong LONG":m.bias<45?"condong SHORT":"netral")+"</span></td>"
+      + "<td>"+(g&&g.rsi1h!==null?g.rsi1h.toFixed(1):"—")+"</td>"
+      + "<td class='small'>"+(g?fmtPrice(g.ema9)+" / "+fmtPrice(g.ema21)+" / "+fmtPrice(g.ema50):"—")+"</td>"
+      + "<td>"+gateHtml(longGates)+"</td>"
+      + "<td>"+gateHtml(shortGates)+"</td>"
+      + "<td>"+verdict+"</td></tr>";
+  });
+  document.getElementById("liveBody").innerHTML = rows;
+  var okN = COINS.filter(function(c){ return liveData[c.s] && !liveData[c.s].error; }).length;
+  var srcs = {}; COINS.forEach(function(c){ var d=liveData[c.s]; if(d&&d.source) srcs[d.source]=(srcs[d.source]||0)+1; });
+  document.getElementById("liveSrc").textContent = "Sumber: " + okN + "/18 koin berhasil — " + Object.keys(srcs).map(function(k){ return k+" ("+srcs[k]+")"; }).join(", ");
+  renderDetail();
+}
+
+function renderDetail(){
+  var d = liveData[selected];
+  var sel = document.getElementById("coinSel");
+  if (sel && sel.value !== selected) sel.value = selected;
+  if (!d || d.error){ return; }
+  var m = d.m, g = d.g;
+  document.getElementById("mPrice").textContent = fmtPrice(m.price);
+  document.getElementById("mSrc").textContent = "Sumber: " + d.source + " · candle 1 menit";
+  document.getElementById("mBias").textContent = m.bias + " / 100";
+  document.getElementById("mRsi").textContent = m.rsi===null?"—":m.rsi.toFixed(1);
+  document.getElementById("mRsi1h").textContent = g&&g.rsi1h!==null?g.rsi1h.toFixed(1):"—";
+  document.getElementById("mEma").textContent = fmtPrice(m.ema20)+" / "+fmtPrice(m.ema50);
+  document.getElementById("mAtr").textContent = m.atr===null?"—":fmtPrice(m.atr);
+  var chg = document.getElementById("mChg"); chg.textContent = fmtPct(m.chg1h); chg.className = "v " + (m.chg1h>=0?"pos":"neg");
+  document.getElementById("mVol").textContent = (m.vol1h===null||isNaN(m.vol1h))?"—":m.vol1h.toFixed(3)+"%";
+  document.getElementById("mSR").textContent = fmtPrice(m.s1)+" / "+fmtPrice(m.r1);
+  document.getElementById("mSR6").textContent = fmtPrice(m.s6)+" / "+fmtPrice(m.r6);
+}
+
+function selectCoin(sym){ selected = sym; renderLive(); }
+
+function loadState(showMsg){
+  return fetch("state.json?ts="+Date.now()).then(function(r){
+    if (!r.ok) throw new Error("HTTP "+r.status);
+    return r.json();
+  }).then(function(s){
+    deskState = s;
+    renderState();
+  }).catch(function(e){
+    document.getElementById("syncInfo").textContent = "state.json gagal dimuat ("+e.message+"). Di GitHub Pages, file state.json harus ada di repo yang sama; kalau dibuka lewat file:// langsung, fetch diblokir browser — jalankan lewat Pages atau server lokal.";
+  });
+}
+
+function livePrice(sym){
+  var d = liveData[sym];
+  return (d && !d.error) ? d.m.price : null;
+}
+
+function renderState(){
+  var s = deskState;
+  if (!s) return;
+  document.getElementById("bal").textContent = fmtMoney(s.balance);
+  document.getElementById("balD").textContent = "Mulai $1.000 · P/L total " + fmtMoney(s.balance - 1000);
+  var day = (s.daily && s.daily.realizedPnl!==undefined) ? s.daily.realizedPnl : 0;
+  var dp = document.getElementById("dayPnl"); dp.textContent = fmtMoney(day); dp.className = "v " + (day>=0?"pos":"neg");
+  document.getElementById("dayDate").textContent = "Tanggal: " + (s.daily ? s.daily.date : "—") + " · Batas rugi harian $20";
+  var pos = s.positions || [];
+  document.getElementById("posN").textContent = pos.length + " / 3";
+  var totUSDT = pos.reduce(function(a,p){ return a + p.qty*p.entry; }, 0);
+  document.getElementById("posD").textContent = "Total USDT dipasang: " + fmtMoney(totUSDT);
+  var tr = s.trades || [];
+  document.getElementById("trN").textContent = tr.length;
+  var wins = tr.filter(function(t){ return t.net>0; }).length;
+  document.getElementById("trD").textContent = wins + " menang · " + (tr.length?Math.round(wins/tr.length*100):0) + "% win rate";
+  document.getElementById("syncInfo").textContent = "state.json terakhir (lastRun mesin): " + (s.lastRun ? wibFull(s.lastRun) : "—") + " · sinkron ke GitHub tiap ~15 menit, jadi posisi bisa tertinggal sampai ~15 menit dari mesin. Harga live di halaman ini diperbarui tiap 60 detik, terpisah dari state.json.";
+  renderPositions();
+  renderTrades();
+}
+
+function renderPositions(){
+  var box = document.getElementById("positions");
+  var s = deskState;
+  var pos = (s && s.positions) || [];
+  if (!pos.length){
+    box.innerHTML = '<div class="card"><p class="sub">Tidak ada posisi terbuka saat ini. Begitu mesin membuka posisi, kartu posisinya muncul di sini (paling lambat ~15 menit setelah state.json berikutnya ter-push).</p></div>';
+    return;
+  }
+  var html = "";
+  if (pos.length > 1) html += '<p><button class="danger" onclick="openCloseModal(null)">Tutup Semua Posisi</button></p>';
+  pos.forEach(function(p){
+    var live = livePrice(p.coin);
+    var usdt = p.qty * p.entry;
+    var nowVal = live===null ? null : p.qty * live;
+    var gross = live===null ? null : (p.side==="short" ? (p.entry-live)*p.qty : (live-p.entry)*p.qty);
+    var feeEst = (live===null ? 0 : 0.0008 * (usdt + p.qty*live));
+    var net = gross===null ? null : gross - feeEst;
+    var r = null;
+    if (live!==null && p.sl!==undefined && p.entry!==p.sl) r = p.side==="short" ? (p.entry-live)/(p.entry-p.sl) : (live-p.entry)/(p.entry-p.sl);
+    html += '<div class="card"><p><b>'+p.coin+'/USDT</b> · <span class="badge '+(p.side==="short"?"err":"live")+'">'+p.side.toUpperCase()+'</span> <span class="small">dibuka '+wibFull(p.openedAt)+'</span></p>'
+      + '<div class="grid">'
+      + '<div class="metric"><div class="k">Entry</div><div class="v" style="font-size:16px">'+fmtPrice(p.entry)+'</div></div>'
+      + '<div class="metric"><div class="k">Harga Live</div><div class="v" style="font-size:16px">'+(live===null?"belum tersedia":fmtPrice(live))+'</div></div>'
+      + '<div class="metric"><div class="k">Jumlah</div><div class="v" style="font-size:16px">'+p.qty.toLocaleString("en-US")+' '+p.coin+'</div></div>'
+      + '<div class="metric"><div class="k">USDT Dipasang</div><div class="v" style="font-size:16px">'+fmtMoney(usdt)+'</div><div class="d">Nilai saat ini: '+(nowVal===null?"—":fmtMoney(nowVal))+'</div></div>'
+      + '<div class="metric"><div class="k">SL / TP</div><div class="v" style="font-size:16px">'+fmtPrice(p.sl)+' / '+fmtPrice(p.tp)+'</div></div>'
+      + '<div class="metric"><div class="k">P/L Mengambang (estimasi bersih)</div><div class="v '+(net===null?"":net>=0?"pos":"neg")+'" style="font-size:16px">'+(net===null?"—":fmtMoney(net)+(r!==null?" ("+(r>=0?"+":"")+r.toFixed(2)+"R)":""))+'</div><div class="d">Kotor '+(gross===null?"—":fmtMoney(gross))+' · fee+slippage est. '+fmtMoney(feeEst)+'</div></div>'
+      + '</div>'
+      + '<p><button class="danger" onclick="openCloseModal(\''+p.coin+'\')">Tutup Sekarang</button> <span class="small">Tombol ada di sini — klik untuk melihat perintah tutup di PC (tidak menutup langsung dari halaman ini).</span></p>'
+      + '</div>';
+  });
+  box.innerHTML = html;
+}
+
+function renderTrades(){
+  var box = document.getElementById("trades");
+  var s = deskState;
+  var tr = (s && s.trades) || [];
+  if (!tr.length){ box.innerHTML = '<div class="card"><p class="sub">Belum ada trade yang ditutup.</p></div>'; return; }
+  var html = '<div class="card" style="overflow:auto"><table><thead><tr><th>Koin</th><th>Arah</th><th>Entry → Exit</th><th>USDT Dipasang</th><th>P/L Bersih</th><th>R</th><th>Alasan</th><th>Ditutup</th></tr></thead><tbody>';
+  tr.slice().reverse().forEach(function(t){
+    html += "<tr><td><b>"+t.coin+"</b></td><td>"+(t.side||"").toUpperCase()+"</td>"
+      + "<td>"+fmtPrice(t.entry)+" → "+fmtPrice(t.exit)+"</td>"
+      + "<td>"+fmtMoney(t.qty*t.entry)+"</td>"
+      + "<td class='"+(t.net>=0?"pos":"neg")+"'><b>"+fmtMoney(t.net)+"</b></td>"
+      + "<td>"+(t.r!==undefined?(t.r>=0?"+":"")+t.r.toFixed(2)+"R":"—")+"</td>"
+      + "<td>"+(t.reason||"—")+"</td>"
+      + "<td class='small'>"+(t.closedAt?wibFull(t.closedAt):"—")+"</td></tr>";
+  });
+  html += "</tbody></table></div>";
+  box.innerHTML = html;
+}
+
+/* ---- close modal (Pages: copyable Node.js command, NOT instant) ---- */
+var modalCoin = null;
+function openCloseModal(coin){
+  modalCoin = coin; // null = ALL
+  var s = deskState;
+  var pos = (s && s.positions) || [];
+  var targets = coin ? pos.filter(function(p){ return p.coin===coin; }) : pos;
+  var title = coin ? "Tutup " + coin + " Sekarang?" : "Tutup Semua Posisi?";
+  document.getElementById("modalTitle").textContent = title;
+  var body = "";
+  targets.forEach(function(p){
+    var live = livePrice(p.coin);
+    var gross = live===null ? null : (p.side==="short" ? (p.entry-live)*p.qty : (live-p.entry)*p.qty);
+    body += '<div class="row"><span>'+p.coin+' '+p.side.toUpperCase()+' · Entry '+fmtPrice(p.entry)+'</span><b>'+(live===null?"harga live belum tersedia":fmtPrice(live))+'</b></div>'
+      + '<div class="row"><span>USDT dipasang</span><b>'+fmtMoney(p.qty*p.entry)+'</b></div>'
+      + '<div class="row"><span>P/L kotor (estimasi)</span><b>'+(gross===null?"—":fmtMoney(gross))+'</b></div>'
+      + '<div class="row"><span>SL / TP</span><b>'+fmtPrice(p.sl)+' / '+fmtPrice(p.tp)+'</b></div>';
+  });
+  if (!targets.length) body = "<p class='small'>Tidak ada posisi yang cocok (state.json mungkin belum tersinkron).</p>";
+  document.getElementById("modalBody").innerHTML = body;
+  var cmd = coin
+    ? "node close-request.cjs " + coin + "\nnode engine.cjs"
+    : "node close-request.cjs ALL\nnode engine.cjs";
+  document.getElementById("modalCmd").textContent = cmd;
+  document.getElementById("copyNote").textContent = "";
+  document.getElementById("modalBg").classList.add("open");
+}
+function closeModal(){ document.getElementById("modalBg").classList.remove("open"); }
+function copyCmd(){
+  var txt = document.getElementById("modalCmd").textContent;
+  function done(){ document.getElementById("copyNote").textContent = "Perintah disalin. Jalankan di PC (folder hasil git clone) — posisi tertutup di harga live saat node engine.cjs jalan."; }
+  if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done, function(){ fallbackCopy(txt); done(); }); }
+  else { fallbackCopy(txt); done(); }
+}
+function fallbackCopy(txt){
+  var ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ---- refresh loop ---- */
+function refreshAll(){
+  state.attempted = true;
+  var jobs = COINS.map(function(c){ return loadCoin(c); });
+  Promise.all(jobs).then(function(){
+    state.anySuccess = COINS.some(function(c){ return liveData[c.s] && !liveData[c.s].error; });
+    updateBadges();
+    renderLive();
+    document.getElementById("clock").textContent = wibTime(new Date());
+    timerLeft = 60;
+  });
+  loadState(false);
+}
+var sel = document.getElementById("coinSel");
+COINS.forEach(function(c){ var o=document.createElement("option"); o.value=c.s; o.textContent=c.s+" — "+c.name; sel.appendChild(o); });
+sel.value = "BTC";
+setInterval(function(){
+  timerLeft--;
+  document.getElementById("countdown").textContent = timerLeft;
+  if (timerLeft <= 0) refreshAll();
+}, 1000);
+refreshAll();
+
+</script>
+</body>
+</html>
