@@ -1,22 +1,6 @@
 {
-  "balance": 1004.161448928805,
-  "positions": [
-    {
-      "coin": "XPL",
-      "pair": "XPLUSDT",
-      "side": "long",
-      "entry": 0.0453691,
-      "qty": 3703.54,
-      "sl": 0.0442845,
-      "tp": 0.0497072,
-      "riskUsd": 4.02,
-      "atr": 0.000723028,
-      "bias": 65,
-      "rsi1h": 57,
-      "openedAt": "2026-11-25T15:59:10.605Z",
-      "source": "Binance Spot"
-    }
-  ],
+  "balance": 1012.8109490943693,
+  "positions": [],
   "trades": [
     {
       "coin": "SOMI",
@@ -49,23 +33,39 @@
       "net": 2.6669,
       "r": 0.67,
       "balance": 1004.16
+    },
+    {
+      "coin": "XPL",
+      "pair": "XPLUSDT",
+      "side": "long",
+      "openedAt": "2026-11-25T15:59:10.605Z",
+      "closedAt": "2026-11-25T17:57:43.761Z",
+      "entry": 0.0453691,
+      "exit": 0.0477604,
+      "qty": 3703.54,
+      "sl": 0.0442845,
+      "tp": 0.0497072,
+      "reason": "MANUAL-CLOSE",
+      "net": 8.6495,
+      "r": 2.15,
+      "balance": 1012.81
     }
   ],
   "daily": {
     "date": "2026-11-25",
-    "realizedPnl": 0
+    "realizedPnl": 8.64950016556428
   },
   "startedAt": "2026-11-24T11:17:11.769Z",
   "halted": false,
   "haltReason": null,
-  "lastRun": "2026-11-25T17:28:59.591Z",
+  "lastRun": "2026-11-25T17:57:53.973Z",
   "lastIndicators": {
     "BTC": {
-      "price": 59133.72,
-      "bias": 54,
+      "price": 59586.01,
+      "bias": 55,
       "rsi1h": 41.1,
-      "rsi1m": 50.8,
-      "chg1h": 0.74,
+      "rsi1m": 51.7,
+      "chg1h": 1.8,
       "ema9": 58629.7,
       "ema21": 59046.9,
       "ema50": 59646.8,
@@ -80,11 +80,11 @@
       "noiseDown": false
     },
     "ETH": {
-      "price": 1658.91,
-      "bias": 65,
+      "price": 1678.16,
+      "bias": 73,
       "rsi1h": 42.3,
-      "rsi1m": 52.1,
-      "chg1h": 0.72,
+      "rsi1m": 57.7,
+      "chg1h": 2.02,
       "ema9": 1646.85,
       "ema21": 1656.64,
       "ema50": 1673.74,
@@ -99,11 +99,11 @@
       "noiseDown": false
     },
     "BNB": {
-      "price": 544.15,
-      "bias": 68,
+      "price": 548.67,
+      "bias": 70,
       "rsi1h": 43.9,
-      "rsi1m": 54.1,
-      "chg1h": 0.96,
+      "rsi1m": 55.4,
+      "chg1h": 1.81,
       "ema9": 539.005,
       "ema21": 541.93,
       "ema50": 546.126,
@@ -118,11 +118,11 @@
       "noiseDown": false
     },
     "ENA": {
-      "price": 0.0955,
-      "bias": 78,
+      "price": 0.0964,
+      "bias": 77,
       "rsi1h": 32.9,
-      "rsi1m": 57.4,
-      "chg1h": 2.69,
+      "rsi1m": 55.4,
+      "chg1h": 3.21,
       "ema9": 0.0938151,
       "ema21": 0.0953516,
       "ema50": 0.0974449,
@@ -137,11 +137,11 @@
       "noiseDown": false
     },
     "ONDO": {
-      "price": 0.2744,
-      "bias": 77,
+      "price": 0.2767,
+      "bias": 74,
       "rsi1h": 42.3,
-      "rsi1m": 56.1,
-      "chg1h": 2.35,
+      "rsi1m": 54.4,
+      "chg1h": 2.48,
       "ema9": 0.269056,
       "ema21": 0.272334,
       "ema50": 0.277359,
@@ -156,11 +156,11 @@
       "noiseDown": false
     },
     "XAU": {
-      "price": 3499.06,
-      "bias": 72,
+      "price": 3517.19,
+      "bias": 74,
       "rsi1h": 33.9,
-      "rsi1m": 59.7,
-      "chg1h": 1.06,
+      "rsi1m": 65.8,
+      "chg1h": 1.63,
       "ema9": 3485.69,
       "ema21": 3515.56,
       "ema50": 3549.76,
@@ -175,11 +175,11 @@
       "noiseDown": false
     },
     "SHIB": {
-      "price": 0.0000035,
-      "bias": 59,
+      "price": 0.00000352,
+      "bias": 66,
       "rsi1h": 41.3,
-      "rsi1m": 52.6,
-      "chg1h": 1.45,
+      "rsi1m": 52.1,
+      "chg1h": 1.73,
       "ema9": 0.00000346241,
       "ema21": 0.00000349344,
       "ema50": 0.00000354109,
@@ -194,11 +194,11 @@
       "noiseDown": false
     },
     "PENGU": {
-      "price": 0.004213,
-      "bias": 79,
+      "price": 0.004262,
+      "bias": 80,
       "rsi1h": 42.5,
-      "rsi1m": 58.3,
-      "chg1h": 2.86,
+      "rsi1m": 58.9,
+      "chg1h": 3.25,
       "ema9": 0.00412803,
       "ema21": 0.00417697,
       "ema50": 0.00424568,
@@ -213,11 +213,11 @@
       "noiseDown": false
     },
     "SUI": {
-      "price": 0.6435,
-      "bias": 78,
+      "price": 0.6494,
+      "bias": 75,
       "rsi1h": 42.5,
-      "rsi1m": 57.5,
-      "chg1h": 2.19,
+      "rsi1m": 56.1,
+      "chg1h": 2.74,
       "ema9": 0.631524,
       "ema21": 0.63804,
       "ema50": 0.647337,
@@ -232,11 +232,11 @@
       "noiseDown": false
     },
     "XPL": {
-      "price": 0.04719,
-      "bias": 81,
+      "price": 0.0478,
+      "bias": 80,
       "rsi1h": 64.1,
-      "rsi1m": 60.6,
-      "chg1h": 3.53,
+      "rsi1m": 58.1,
+      "chg1h": 3.55,
       "ema9": 0.045153,
       "ema21": 0.0449417,
       "ema50": 0.0450756,
@@ -251,11 +251,11 @@
       "noiseDown": false
     },
     "PUMP": {
-      "price": 0.002398,
-      "bias": 79,
+      "price": 0.002456,
+      "bias": 85,
       "rsi1h": 39.3,
-      "rsi1m": 58.8,
-      "chg1h": 2.74,
+      "rsi1m": 62.5,
+      "chg1h": 4.91,
       "ema9": 0.00235472,
       "ema21": 0.00238546,
       "ema50": 0.00242903,
@@ -270,11 +270,11 @@
       "noiseDown": false
     },
     "PYTH": {
-      "price": 0.04804,
-      "bias": 80,
+      "price": 0.04823,
+      "bias": 60,
       "rsi1h": 36.4,
-      "rsi1m": 59.6,
-      "chg1h": 3.16,
+      "rsi1m": 50.7,
+      "chg1h": 3.19,
       "ema9": 0.0469775,
       "ema21": 0.0477067,
       "ema50": 0.0487222,
@@ -289,11 +289,11 @@
       "noiseDown": false
     },
     "ZEC": {
-      "price": 718.97,
+      "price": 734.97,
       "bias": 84,
       "rsi1h": 30.4,
-      "rsi1m": 63.8,
-      "chg1h": 4.1,
+      "rsi1m": 59.4,
+      "chg1h": 5.83,
       "ema9": 707.42,
       "ema21": 720.022,
       "ema50": 739.014,
@@ -308,11 +308,11 @@
       "noiseDown": false
     },
     "ASTER": {
-      "price": 0.49,
-      "bias": 78,
+      "price": 0.4915,
+      "bias": 67,
       "rsi1h": 46.6,
-      "rsi1m": 64.6,
-      "chg1h": 1.96,
+      "rsi1m": 52.1,
+      "chg1h": 1.82,
       "ema9": 0.480665,
       "ema21": 0.482797,
       "ema50": 0.489204,
@@ -327,11 +327,11 @@
       "noiseDown": false
     },
     "JUP": {
-      "price": 0.22,
-      "bias": 81,
+      "price": 0.2219,
+      "bias": 76,
       "rsi1h": 37.8,
-      "rsi1m": 63.9,
-      "chg1h": 2.33,
+      "rsi1m": 54.3,
+      "chg1h": 3.26,
       "ema9": 0.215661,
       "ema21": 0.218581,
       "ema50": 0.223625,
@@ -346,11 +346,11 @@
       "noiseDown": false
     },
     "HYPE": {
-      "price": 59.32,
-      "bias": 81,
+      "price": 59.83,
+      "bias": 64,
       "rsi1h": 39.5,
-      "rsi1m": 60.7,
-      "chg1h": 2.91,
+      "rsi1m": 52,
+      "chg1h": 3.33,
       "ema9": 57.9109,
       "ema21": 58.8089,
       "ema50": 60.32,
@@ -365,11 +365,11 @@
       "noiseDown": false
     },
     "WCT": {
-      "price": 0.02815,
-      "bias": 60,
+      "price": 0.02827,
+      "bias": 69,
       "rsi1h": 53.4,
-      "rsi1m": 52.8,
-      "chg1h": 1.44,
+      "rsi1m": 58,
+      "chg1h": 1.47,
       "ema9": 0.0276168,
       "ema21": 0.0276313,
       "ema50": 0.0279987,
@@ -384,11 +384,11 @@
       "noiseDown": false
     },
     "SOMI": {
-      "price": 0.1129,
-      "bias": 77,
+      "price": 0.1136,
+      "bias": 75,
       "rsi1h": 49,
-      "rsi1m": 57.4,
-      "chg1h": 1.99,
+      "rsi1m": 59.4,
+      "chg1h": 2.9,
       "ema9": 0.109949,
       "ema21": 0.110525,
       "ema50": 0.112207,
