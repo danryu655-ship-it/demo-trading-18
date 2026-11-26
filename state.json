@@ -104,7 +104,7 @@
   "startedAt": "2026-11-24T11:17:11.769Z",
   "halted": false,
   "haltReason": null,
-  "lastRun": "2026-11-26T04:43:59.473Z",
+  "lastRun": "2026-11-26T05:01:26.264Z",
   "lastIndicators": {
     "BTC": {
       "price": 61056.35,
@@ -449,7 +449,98 @@
       "noiseDown": false
     }
   },
-  "dataErrors": [],
+  "dataErrors": [
+    {
+      "coin": "BTC",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "ETH",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "BNB",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "ENA",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "ONDO",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "XAU",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "SHIB",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "PENGU",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "SUI",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "XPL",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "PUMP",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "PYTH",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "ZEC",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "ASTER",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "JUP",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "HYPE",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "WCT",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    },
+    {
+      "coin": "SOMI",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
+    }
+  ],
   "config": {
     "coins": [
       "BTCUSDT",
