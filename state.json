@@ -104,7 +104,7 @@
   "startedAt": "2026-11-24T11:17:11.769Z",
   "halted": false,
   "haltReason": null,
-  "lastRun": "2026-11-26T10:00:37.569Z",
+  "lastRun": "2026-11-26T10:16:15.006Z",
   "lastIndicators": {
     "BTC": {
       "price": 61056.35,
@@ -517,7 +517,7 @@
     },
     {
       "coin": "ASTER",
-      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US: fetch failed | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Binance US h1: fetch failed | Binance US: data 1 jam kurang | OKX h1: fetch failed | OKX: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
       "rateLimited": false
     },
     {
