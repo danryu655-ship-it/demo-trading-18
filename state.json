@@ -104,7 +104,7 @@
   "startedAt": "2026-11-24T11:17:11.769Z",
   "halted": false,
   "haltReason": null,
-  "lastRun": "2026-11-27T02:01:34.540Z",
+  "lastRun": "2026-11-27T02:16:10.342Z",
   "lastIndicators": {
     "BTC": {
       "price": 61056.35,
@@ -537,8 +537,8 @@
     },
     {
       "coin": "SOMI",
-      "error": "Semua sumber gagal: Binance Spot: HTTP 418 {\"code\":-1003,\"msg\":\"Way too much request weight used; IP banned until 1795744894988. Please use WebSocket Streams for l | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
-      "rateLimited": true
+      "error": "Semua sumber gagal: Binance Spot h1: fetch failed | Binance Spot: data 1 jam kurang | Gate.io h1: fetch failed | Gate.io: data 1 jam kurang",
+      "rateLimited": false
     }
   ],
   "config": {
